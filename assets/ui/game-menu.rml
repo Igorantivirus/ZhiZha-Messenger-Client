@@ -1,0 +1,44 @@
+<rml lang="ru">
+
+  <head>
+    <title>Game HUD</title>
+    <link type="text/rcss" href="rml.rcss" />
+    <link type="text/rcss" href="game-menu.rcss" />
+
+    <link type="text/template" href="overlays/gameover-overlay.rml" />
+    <link type="text/template" href="overlays/pause-overlay.rml" />
+    <link type="text/template" href="overlays/win-overlay.rml" />
+
+    <link type="text/rcss" href="overlays/overlay.rcss" />
+    <link type="text/rcss" href="overlays/menu-buttons.rcss" />
+  </head>
+
+  <body data-model="game-status">
+
+    <div id="status-bar">
+      <div class="status-item">
+        <p class="label">Время</p>
+        <p class="value">{{ time }}</p>
+      </div>
+      <div class="status-item">
+        <p class="label">Очки</p>
+        <p class="value">{{ points }}</p>
+      </div>
+      <div class="status-item">
+        <p class="label">Рекорд</p>
+        <p class="value">{{ record }}</p>
+      </div>
+      <div class="status-item">
+        <p class="label">Ошибок</p>
+        <p class="value">{{death}}/{{maxdeath}}</p>
+      </div>
+
+      <button id="pause-b" class="icon-button"><span>❚❚</span></button>
+    </div>
+
+    <template src="pause-overlay"></template>
+    <template src="gameover-overlay"></template>
+    <template src="win-overlay"></template>
+
+  </body>
+</rml>

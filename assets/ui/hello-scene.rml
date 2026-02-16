@@ -1,0 +1,46 @@
+<rml lang="ru">
+
+    <head>
+        <title>Document</title>
+        <link type="text/rcss" href="rml.rcss" />
+        <link type="text/rcss" href="hello-scene.rcss" />
+    </head>
+
+    <body>
+
+        <div class="head">
+            <p>
+                ZhiZha Messenger
+            </p>
+        </div>
+
+        <div class="main">
+
+            <p class="label">Регистрация</p>
+
+            <div class="info-input">
+                <p>Имя пользователя</p>
+                <input type="text" id="username" data-value="username" value="igoranvitirus" maxlength="30" size="30" />
+            </div>
+            <div class="info-input">
+                <p>Код сервера</p>
+                <input type="text" id="username" data-value="username" value="aboba" maxlength="30" size="30" />
+            </div>
+            <div class="info-input">
+                <p>Пароль</p>
+                <input type="text" id="username" data-value="username" value="negr" maxlength="30" size="30" />
+            </div>
+
+            <button class="connect-button"><span>Подключиться</span></button>
+
+        </div>
+
+        <div class="footer">
+            <p class="version">v - 0.1.0</p>
+            <p class="author">by Igorantivirus</p>
+        </div>
+
+
+
+    </body>
+</rml>

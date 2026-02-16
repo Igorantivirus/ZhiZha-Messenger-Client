@@ -1,0 +1,16 @@
+*.iml
+.gradle
+local.properties
+.idea
+app/build
+.externalNativeBuild
+.cxx
+local.properties
+
+.vscode
+build
+
+_3rdparty
+cwd
+release
+scripts

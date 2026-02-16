@@ -1,0 +1,165 @@
+body {
+    background-color: rgb(173, 216, 230);
+
+    font-family: "DejaVu Sans";
+    font-size: 20px;
+
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 30px 30px 30px 30px;
+
+    box-sizing: border-box;
+}
+
+/*HEADER*/
+.head {
+    width: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 15px 15px 15px 15px;
+    margin-bottom: 30px;
+
+    background-color: rgba(255, 255, 255, 89);
+
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 89);
+    border-radius: 16px;
+}
+
+.head p {
+    margin: 0px;
+    color: black;
+
+    /* вместо 700% — предсказуемый размер */
+    font-size: 50px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/*FOOTER*/
+.footer {
+    width: 100%;
+
+    margin-top: auto;
+
+    padding: 13px 13px 13px 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    box-sizing: border-box;
+}
+
+.footer p {
+    width: 50%;
+    color: black;
+    font-size: 20px;
+}
+
+.version {
+    text-align: left;
+}
+
+.author {
+    text-align: right;
+}
+
+/*MAIN*/
+
+.main {
+    width: 50%;
+    min-width: 250px;
+    height: auto;
+
+    padding: 10px 10px 10px 10px;
+
+    background-color: #fff9f3;
+    border: 2px black;
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+
+    color: black;
+}
+
+.main .label {
+    background-color: rgb(0, 255, 255);
+    border: 1px black;
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+}
+
+
+input[type=text] {
+    display: block;
+
+    width: 75%;
+    padding: 6px 10px;
+    margin: 5px 0 15px;
+
+    border: 1px black;
+
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.info-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 10px 10px 10px 10px;
+}
+
+/* input[type=text]:focus { */
+/* border-color: #4d90fe; */
+/* outline: none; */
+/* box-shadow: 0 0 5px #4d90fe; */
+/* } */
+
+input[type=text]:invalid:not(:placeholder-shown) {
+    border-color: #d9534f;
+    background-color: #fdf7f7;
+}
+
+input[type=text]::placeholder {
+    color: black;
+}
+
+.connect-button span { pointer-events: none; }
+
+.connect-button {
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 10px 20px 10px 20px;
+
+    color: black;
+
+    background-color: blue;
+    border: 2px black;
+    border-radius: 10px;
+}
+
+.connect-button:hover {
+    background-color: rgb(0, 75, 195);
+}
+
+.connect-button:active {
+    background-color: rgb(53, 160, 0);
+}
