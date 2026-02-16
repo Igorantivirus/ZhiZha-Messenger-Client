@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <string_view>
 
 namespace names
@@ -20,4 +19,9 @@ constexpr const std::string_view fontPath = "fonts/fonts.txt";
 namespace ui::HelloScene
 {
 constexpr const std::string_view file = "ui/hello-scene.rml";
-} // namespace ui::mainMenu
+} // namespace ui::HelloScene
+
+namespace ui::ChatScene
+{
+constexpr const std::string_view file = "ui/chat-scene.rml";
+} // namespace ui::ChatScene

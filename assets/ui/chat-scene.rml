@@ -1,0 +1,70 @@
+
+<rml>
+<head>
+	<title>Chat</title>
+    <link type="text/rcss" href="rml.rcss" />
+	<link type="text/rcss" href="chat-scene.rcss"/>
+</head>
+
+<body>
+	<div id="app">
+
+		<!-- LEFT: chat list -->
+		<div id="sidebar">
+			<div id="sidebar_header">Чаты</div>
+
+			<div id="chat_list">
+				<div class="chat-item active">
+					<div class="chat-title">Общий</div>
+					<div class="chat-last">Последнее: «Ок, понял»</div>
+				</div>
+
+				<div class="chat-item">
+					<div class="chat-title">Поддержка</div>
+					<div class="chat-last">Последнее: «Здравствуйте!»</div>
+				</div>
+                
+			</div>
+		</div>
+
+		<!-- RIGHT: messages -->
+		<div id="main">
+			<div id="chat_header">
+				<div id="chat_name">Общий</div>
+			</div>
+
+			<div id="messages">
+				<!-- <div class="msg-row other">
+					<div class="msg">Привет! Ты на месте?</div>
+				</div>
+
+				<div class="msg-row me">
+					<div class="msg">Да, привет 🙂 Что нужно?</div>
+				</div>
+
+				<div class="msg-row other">
+					<div class="msg">Скинь, пожалуйста, апдейт по задаче.</div>
+				</div>
+
+				<div class="msg-row me">
+					<div class="msg">Сделал основу. Сейчас допиливаю скролл и выравнивание.</div>
+				</div>
+
+				<div class="msg-row other">
+					<div class="msg">Ок. Тогда жду короткий итог сегодня.</div>
+				</div>
+
+				<div class="msg-row me">
+					<div class="msg">Принято.</div>
+				</div> -->
+			</div>
+
+			<div id="composer">
+				<input id="message_input" type="text" value=""/>
+				<button id="send_button">Отправить</button>
+			</div>
+		</div>
+
+	</div>
+</body>
+</rml>

@@ -24,14 +24,14 @@
             </div>
             <div class="info-input">
                 <p>Код сервера</p>
-                <input type="text" id="username" data-value="username" value="aboba" maxlength="30" size="30" />
+                <input type="text" id="server" data-value="username" value="10.241.69.217:18080/ws" maxlength="30" size="30" />
             </div>
             <div class="info-input">
                 <p>Пароль</p>
-                <input type="text" id="username" data-value="username" value="negr" maxlength="30" size="30" />
+                <input type="text" id="password" data-value="username" value="negr" maxlength="30" size="30" />
             </div>
 
-            <button class="connect-button"><span>Подключиться</span></button>
+            <button id="connect-btn" class="connect-button"><span>Подключиться</span></button>
 
         </div>
 

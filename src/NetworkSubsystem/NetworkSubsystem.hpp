@@ -16,6 +16,7 @@
 #include <network/WebSocketClient.hpp>
 
 #include "ThreadSafeQueue.hpp"
+#include "NetEvent.hpp"
 
 class NetworkSubsystem
 {
@@ -118,7 +119,16 @@ public:
 
     // Опционально: обёртка под отправку, чтобы сцены НЕ трогали client напрямую
     // (реальную реализацию sendText ты уже сделал)
-    void sendText(std::string msg);
+    // void sendText(std::string msg);
+
+    ThreadSafeQueue<NetEvent>& getQueue()
+    {
+        return queue_;
+    }
+    const ThreadSafeQueue<NetEvent>& getQueue() const
+    {
+        return queue_;
+    }
 
 private:
     IoContext io_{};
@@ -128,7 +138,7 @@ private:
     std::atomic_bool isWorking_{false};
 
     std::shared_ptr<ws::WebSocketClient> client_;
-    ThreadSafeQueue<int> queue_;
+    ThreadSafeQueue<NetEvent> queue_;
 
 private:
     void startWebSocket()
@@ -165,26 +175,38 @@ private: // net Thread
     }
     void onOpen()
     {
+        NetEvent ev;
+        ev.setData(NetEvent::OnOpen{}, NetEvent::Type::onOpen);
+        queue_.push(std::move(ev));
         std::cout << "void onOpen()" << '\n';
     }
 
     void onText(std::string_view s)
     {
-        std::cout << "void onText(std::string_view" << s << '\n';
+        NetEvent ev;
+        ev.setData(NetEvent::OnText{.text = std::string(s)}, NetEvent::Type::onText);
+        queue_.push(std::move(ev));
+        std::cout << "onText(std::string_view s): " << s << '\n';
     }
 
     void onByte(std::span<const std::uint8_t> bytes)
     {
-        std::cout << "void onByte(std::span<const " << '\n';
+        std::cout << "onByte(std::span<const std::uint8_t> bytes): " << '\n';
     }
 
     void onClose(boost::beast::websocket::close_reason reason)
     {
-        std::cout << "void onClose(boost::beast::w" << reason.code << ' ' << reason.reason << '\n';
+        NetEvent ev;
+        ev.setData(NetEvent::OnClose{.reason = reason}, NetEvent::Type::onClose);
+        queue_.push(std::move(ev));
+        std::cout << "onClose(boost::beast::websocket::close_reason reason): " << reason.code << ' ' << reason.reason << '\n';
     }
 
     void onError(std::string_view stage, boost::beast::error_code ec)
     {
-        std::cout << "void onError(std::string_vie" << stage << ' ' << ec << '\n';
+        NetEvent ev;
+        ev.setData(NetEvent::OnError{.stage = std::string(stage), .ec = ec}, NetEvent::Type::onError);
+        queue_.push(std::move(ev));
+        std::cout << "void onError(std::string_view): " << stage << ' ' << ec << '\n';
     }
 };

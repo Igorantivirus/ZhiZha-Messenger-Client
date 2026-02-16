@@ -42,6 +42,11 @@ struct Arguments
     {
         return dynamic_cast<const T *>(this);
     }
+    template <class T>
+    T *as()
+    {
+        return dynamic_cast<T *>(this);
+    }
 };
 
 } // namespace engine
