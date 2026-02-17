@@ -1,254 +1,412 @@
 body {
-    width: 100%;
-    height: 100%;
-    margin: 0px;
-    padding: 0px;
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
 
-    font-family: "DejaVu Sans";
-    font-size: 16px;
-    color: #1f1f1f;
+	font-family: "DejaVu Sans";
+	font-size: 16px;
+	color: #1f1f1f;
 
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 
 #app {
-    display: flex;
-    width: 100%;
-    height: 100%;
+	display: flex;
+	width: 100%;
+	height: 100%;
 }
 
 /* ========== Sidebar ========== */
 
 #sidebar {
-    width: 260px;
-    height: 100%;
+	width: 260px;
+	height: 100%;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    border-right: 2px black;
-    background-color: #f5f5f5;
+	border-right: 2px black;
+	background-color: #f5f5f5;
 }
 
 #sidebar_header {
-    padding: 10px;
-    border-bottom: 2px black;
+	padding: 10px;
+	border-bottom: 2px black;
 
-    font-size: 18px;
-    background-color: #fafafa;
+	font-size: 18px;
+	background-color: #fafafa;
 }
 
 #chat_list {
-    flex: 1;
-    height: 0px;
-    /* важно для скролла внутри flex */
-    padding: 10px;
+	flex: 1;
+	height: 0px; /* важно для скролла внутри flex */
+	padding: 10px;
 
-    overflow-y: scroll;
-    overflow-x: hidden;
+	overflow-y: scroll;
+	overflow-x: hidden;
 
-    background-color: #f5f5f5;
+	background-color: #f5f5f5;
 }
 
 .chat-item {
-    padding: 10px;
-    margin-bottom: 10px;
+	padding: 10px;
+	margin-bottom: 10px;
 
-    border: 2px black;
-    border-radius: 8px;
+	border: 2px black;
+	border-radius: 8px;
 
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 
 .chat-item:hover {
-    background-color: #efefef;
+	background-color: #efefef;
 }
 
 .chat-item.active {
-    background-color: #e8f1ff;
+	background-color: #e8f1ff;
 }
 
 .chat-title {
-    font-size: 16px;
+	font-size: 16px;
 }
 
 .chat-last {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #444444;
+	margin-top: 4px;
+	font-size: 12px;
+	color: #444444;
+}
+
+#sidebar_footer {
+	padding: 10px;
+	border-top: 2px black;
+
+	background-color: #fafafa;
+}
+
+#open_group_panel {
+	width: 100%;
+	padding: 8px 10px;
+
+	border: 2px black;
+	border-radius: 8px;
+
+	background-color: #e8f1ff;
+}
+
+#open_group_panel:hover {
+	background-color: #d7e6ff;
 }
 
 /* ========== Main chat ========== */
 
 #main {
-    flex: 1;
-    height: 100%;
+	flex: 1;
+	height: 100%;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 
 #chat_header {
-    padding: 10px;
-    border-bottom: 2px black;
+	padding: 10px;
+	border-bottom: 2px black;
 
-    background-color: #fafafa;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	background-color: #fafafa;
 }
 
 #chat_name {
-    font-size: 18px;
+	font-size: 18px;
+}
+
+#chat_actions {
+	display: flex;
+}
+
+#chat_actions button {
+	margin-left: 10px;
+	padding: 6px 10px;
+
+	border: 2px black;
+	border-radius: 8px;
+
+	background-color: #ffffff;
+}
+
+#chat_actions button:hover {
+	background-color: #efefef;
 }
 
 #messages {
-    flex: 1;
-    height: 0px;
-    /* важно для скролла внутри flex */
-    padding: 12px;
+	flex: 1;
+	height: 0px; /* важно для скролла внутри flex */
+	padding: 12px;
 
-    overflow-y: scroll;
-    overflow-x: hidden;
+	overflow-y: scroll;
+	overflow-x: hidden;
 
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 
-/* message rows */
-.msg-row {
-    width: 100%;
+/* ========== Messages (with name) ========== */
 
-    display: flex;
-    margin-bottom: 10px;
+.msg-row {
+	width: 100%;
+	display: flex;
+	margin-bottom: 10px;
 }
 
 .msg-row.other {
-    justify-content: flex-start;
+	justify-content: flex-start;
 }
 
 .msg-row.me {
-    justify-content: flex-end;
+	justify-content: flex-end;
 }
 
-/* message bubble */
+.msg-stack {
+	display: flex;
+	flex-direction: column;
+
+	/* Важно: ограничиваем колонку, а пузырь делаем shrink-to-fit */
+	max-width: 70%;
+
+	/* Важно для RmlUi flex: не даём колонке схлопываться в “1 символ” */
+	flex: none;
+}
+
+.msg-row.other .msg-stack {
+	align-items: flex-start;
+}
+
+.msg-row.me .msg-stack {
+	align-items: flex-end;
+}
+
+.msg-name {
+	font-size: 12px;
+	color: #444444;
+	margin-bottom: 2px;
+}
+
 #messages .msg {
-    padding: 8px 10px;
+	padding: 8px 10px;
 
-    border: 2px black;
-    border-radius: 10px;
+	border: 2px black;
+	border-radius: 10px;
 
-    background-color: #f2f2f2;
+	background-color: #f2f2f2;
 
-    /* ключевые строки для фикса */
-    display: block;
-    /* width: auto; */
-    max-width: 70%;
-    white-space: normal;
-    word-break: break-word;
+	/* ключевое: переносы */
+	white-space: normal;
+	word-break: break-word;
 
-    /* на случай, если базовые стили трогают flex/минимальные размеры */
-    flex: 0 1 auto;
-    min-width: 200px;
+	/* ключевое: ширина по контенту (не на всю строку), но с ограничением по max-width родителя */
+	display: inline-block;
+
+	/* и ещё: не позволяем “shrink” от чужих базовых стилей */
+	flex: none;
 }
 
-
+.msg-row.me #messages .msg {
+	background-color: #e8f1ff;
+}
+/* (если селектор выше где-то не сработает из-за специфичности, есть дубль ниже) */
 .msg-row.me .msg {
-    background-color: #e8f1ff;
+	background-color: #e8f1ff;
 }
 
 /* ========== Composer ========== */
 
 #composer {
-    display: flex;
-    padding: 10px;
-    border-top: 2px black;
+	display: flex;
+	padding: 10px;
+	border-top: 2px black;
 
-    background-color: #fafafa;
+	background-color: #fafafa;
 }
 
 #message_input {
-    flex: 1;
-    height: 34px;
-    padding: 6px 8px;
+	flex: 1;
+	height: 34px;
+	padding: 6px 8px;
 
-    border: 2px black;
-    border-radius: 8px;
+	border: 2px black;
+	border-radius: 8px;
 
-    background-color: #ffffff;
-    color: #1f1f1f;
+	background-color: #ffffff;
+	color: #1f1f1f;
 }
 
 #send_button {
-    margin-left: 10px;
-    padding: 6px 12px;
+	margin-left: 10px;
+	padding: 6px 12px;
 
-    border: 2px black;
-    border-radius: 8px;
+	border: 2px black;
+	border-radius: 8px;
 
-    background-color: #e8f1ff;
+	background-color: #e8f1ff;
 }
 
 #send_button:hover {
-    background-color: #d7e6ff;
+	background-color: #d7e6ff;
+}
+
+/* ========== Create group overlay ========== */
+/* Абсолютное позиционирование: элемент вне потока и располагается поверх. :contentReference[oaicite:1]{index=1} */
+
+.hidden {
+	display: none;
+}
+
+#group_overlay {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	background-color: #dddddd;
+}
+
+#group_panel {
+	width: 420px;
+	height: 420px;
+
+	display: flex;
+	flex-direction: column;
+
+	padding: 12px;
+
+	border: 2px black;
+	border-radius: 10px;
+
+	background-color: #ffffff;
+}
+
+#group_panel_header {
+	padding: 8px 10px;
+	border-bottom: 2px black;
+
+	font-size: 18px;
+
+	background-color: #fafafa;
+}
+
+#user_list {
+	flex: 1;
+	height: 0px; /* важно для скролла внутри flex */
+	padding: 10px;
+
+	overflow-y: scroll;
+	overflow-x: hidden;
+
+	background-color: #ffffff;
+}
+
+.user-item {
+	padding: 8px 10px;
+	margin-bottom: 8px;
+
+	border: 2px black;
+	border-radius: 8px;
+
+	background-color: #ffffff;
+}
+
+.user-item:hover {
+	background-color: #efefef;
+}
+
+#group_panel_footer {
+	padding-top: 10px;
+	border-top: 2px black;
+}
+
+#create_group_btn {
+	width: 100%;
+	padding: 8px 10px;
+
+	border: 2px black;
+	border-radius: 8px;
+
+	background-color: #e8f1ff;
+}
+
+#create_group_btn:hover {
+	background-color: #d7e6ff;
 }
 
 /* ========== Scrollbars (RmlUi generated elements) ========== */
-/* RmlUi генерирует scrollbarvertical/scrollbarhorizontal и дочерние slider* элементы. */
+/* RmlUi генерирует scrollbarvertical/scrollbarhorizontal и slider* элементы. :contentReference[oaicite:2]{index=2} */
+/* overflow: scroll/auto создаёт скроллбар. :contentReference[oaicite:3]{index=3} */
+
 scrollbarvertical {
-    width: 12px;
-    background-color: #f0f0f0;
+	width: 12px;
+	background-color: #f0f0f0;
 }
 
 scrollbarvertical sliderarrowdec,
 scrollbarvertical sliderarrowinc {
-    width: 0px;
-    height: 0px;
+	width: 0px;
+	height: 0px;
 }
 
 scrollbarvertical slidertrack {
-    width: 12px;
-    background-color: #f0f0f0;
+	width: 12px;
+	background-color: #f0f0f0;
 }
 
 scrollbarvertical sliderbar {
-    width: 8px;
-    margin: 2px;
+	width: 8px;
+	margin: 2px;
 
-    background-color: #b0b0b0;
-    border-radius: 6px;
+	background-color: #b0b0b0;
+	border-radius: 6px;
 }
 
 scrollbarvertical sliderbar:hover {
-    background-color: #9a9a9a;
+	background-color: #9a9a9a;
 }
 
 scrollbarhorizontal {
-    height: 12px;
-    background-color: #f0f0f0;
+	height: 12px;
+	background-color: #f0f0f0;
 }
 
 scrollbarhorizontal sliderarrowdec,
 scrollbarhorizontal sliderarrowinc {
-    width: 0px;
-    height: 0px;
+	width: 0px;
+	height: 0px;
 }
 
 scrollbarhorizontal slidertrack {
-    height: 12px;
-    background-color: #f0f0f0;
+	height: 12px;
+	background-color: #f0f0f0;
 }
 
 scrollbarhorizontal sliderbar {
-    height: 8px;
-    margin: 2px;
+	height: 8px;
+	margin: 2px;
 
-    background-color: #b0b0b0;
-    border-radius: 6px;
+	background-color: #b0b0b0;
+	border-radius: 6px;
 }
 
 scrollbarhorizontal sliderbar:hover {
-    background-color: #9a9a9a;
+	background-color: #9a9a9a;
 }
 
 scrollbarcorner {
-    background-color: #f0f0f0;
+	background-color: #f0f0f0;
 }

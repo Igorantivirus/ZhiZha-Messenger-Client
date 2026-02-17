@@ -1,14 +1,14 @@
-
 <rml>
 <head>
 	<title>Chat</title>
-    <link type="text/rcss" href="rml.rcss" />
+
+	<link type="text/rcss" href="rml.rcss" />
 	<link type="text/rcss" href="chat-scene.rcss"/>
 </head>
 
 <body>
-	<div id="app">
 
+	<div id="app">
 		<!-- LEFT: chat list -->
 		<div id="sidebar">
 			<div id="sidebar_header">Чаты</div>
@@ -23,7 +23,10 @@
 					<div class="chat-title">Поддержка</div>
 					<div class="chat-last">Последнее: «Здравствуйте!»</div>
 				</div>
-                
+			</div>
+
+			<div id="sidebar_footer">
+				<button id="open_group_panel">Создать группу</button>
 			</div>
 		</div>
 
@@ -31,9 +34,43 @@
 		<div id="main">
 			<div id="chat_header">
 				<div id="chat_name">Общий</div>
+
+				<div id="chat_actions">
+					<button id="add_member_btn">Добавить участника в группу</button>
+					<button id="leave_group_btn">Покинуть группу</button>
+				</div>
 			</div>
 
 			<div id="messages">
+				<!-- OTHER -->
+				<div class="msg-row other">
+					<div class="msg-stack">
+						<div class="msg-name">Иван</div>
+						<div class="msg">Привет! Ты на месте?</div>
+					</div>
+				</div>
+
+				<!-- ME -->
+				<div class="msg-row me">
+					<div class="msg-stack">
+						<div class="msg-name">Я</div>
+						<div class="msg">Да, привет 🙂 Что нужно?</div>
+					</div>
+				</div>
+
+				<div class="msg-row other">
+					<div class="msg-stack">
+						<div class="msg-name">Иван</div>
+						<div class="msg">Скинь, пожалуйста, апдейт по задаче. И ещё: длинный текст чтобы проверить переносы и поведение пузыря сообщений внутри максимальной ширины.</div>
+					</div>
+				</div>
+
+				<div class="msg-row me">
+					<div class="msg-stack">
+						<div class="msg-name">Я</div>
+						<div class="msg">Сделал основу. Сейчас добавил панель создания группы и кнопки в хедере.</div>
+					</div>
+				</div>
 			</div>
 
 			<div id="composer">
@@ -41,7 +78,31 @@
 				<button id="send_button">Отправить</button>
 			</div>
 		</div>
-
 	</div>
+
+	<!-- CREATE GROUP PANEL (overlay). По умолчанию скрыто: class="hidden"
+	<div id="group_overlay" class="hidden">
+		<div id="group_panel">
+			<div id="group_panel_header">Создание группы</div>
+
+			<div id="user_list">
+				<div class="user-item">Анна</div>
+				<div class="user-item">Иван</div>
+				<div class="user-item">Мария</div>
+				<div class="user-item">Пётр</div>
+				<div class="user-item">Сергей</div>
+				<div class="user-item">Ольга</div>
+				<div class="user-item">Никита</div>
+				<div class="user-item">Дмитрий</div>
+				<div class="user-item">Екатерина</div>
+				<div class="user-item">Алексей</div>
+			</div>
+
+			<div id="group_panel_footer">
+				<button id="create_group_btn">Создать группу</button>
+			</div>
+		</div>
+	</div> -->
+
 </body>
 </rml>
