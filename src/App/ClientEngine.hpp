@@ -1,8 +1,9 @@
 #pragma once
 
-#include "NetworkSubsystem/NetEvent.hpp"
-#include "NetworkSubsystem/ThreadSafeQueue.hpp"
+#include <App/NetworkSubsystem/NetEvent.hpp>
+#include <App/NetworkSubsystem/ThreadSafeQueue.hpp>
 #include <App/ClientArguments.hpp>
+#include <App/AppContext.hpp>
 #include <Engine/Engine.hpp>
 
 class ClientEngine : public engine::Engine
@@ -10,6 +11,7 @@ class ClientEngine : public engine::Engine
 public:
 private:
     ClientArguments args_;
+    AppContext app_;
     NetworkSubsystem subsystem_;
     NetEventHub netHub_;
 
@@ -31,6 +33,7 @@ private:
             return;
         clientArgs->network = &subsystem_;
         clientArgs->netHub = &netHub_;
+        clientArgs->app = &app_;
     }
 
     bool initOptionalSubsystems(const engine::EngineSettings &setts) override
