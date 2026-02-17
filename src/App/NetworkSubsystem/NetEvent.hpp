@@ -66,3 +66,4 @@ private:
     Type type_ = Type::onOpen;
     DataValue data_;
 };
+

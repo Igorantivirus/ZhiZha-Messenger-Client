@@ -110,3 +110,4 @@ private:
     std::vector<Entry> listeners_;
     bool dispatching_ = false;
 };
+

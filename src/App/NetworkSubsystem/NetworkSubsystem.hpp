@@ -15,8 +15,8 @@
 
 #include <network/WebSocketClient.hpp>
 
-#include "ThreadSafeQueue.hpp"
 #include "NetEvent.hpp"
+#include "ThreadSafeQueue.hpp"
 
 class NetworkSubsystem
 {
@@ -69,7 +69,7 @@ public:
         }
 
         // Сигналим run() вернуться как можно скорее
-        io_.stop(); // :contentReference[oaicite:2]{index=2}
+        io_.stop();
 
         if (netThread_.joinable())
         {
@@ -79,7 +79,7 @@ public:
         client_.reset();
     }
 
-    // Внешнее управление (как ты и хотел)
+    // Внешнее управление
     void setWorking(bool v)
     {
         v ? start() : stop();
@@ -89,7 +89,6 @@ public:
         return isWorking_.load(std::memory_order_acquire);
     }
 
-    // Доступ к io_context (если нужно)
     IoContext &io() noexcept
     {
         return io_;
@@ -99,7 +98,6 @@ public:
         return io_;
     }
 
-    // Клиентом владеет подсистема (shared_ptr — ок)
     void setClient(std::shared_ptr<ws::WebSocketClient> c)
     {
         client_ = std::move(c);
@@ -109,23 +107,17 @@ public:
         return client_;
     }
 
-    // Удобный способ выполнить код в io-потоке (thread-safe через очередь io_context)
-    // io_context можно безопасно использовать конкурентно, например post() из другого потока. :contentReference[oaicite:3]{index=3}
     template <class F>
     void post(F &&f)
     {
         boost::asio::post(io_, std::forward<F>(f));
     }
 
-    // Опционально: обёртка под отправку, чтобы сцены НЕ трогали client напрямую
-    // (реальную реализацию sendText ты уже сделал)
-    // void sendText(std::string msg);
-
-    ThreadSafeQueue<NetEvent>& getQueue()
+    ThreadSafeQueue<NetEvent> &getQueue()
     {
         return queue_;
     }
-    const ThreadSafeQueue<NetEvent>& getQueue() const
+    const ThreadSafeQueue<NetEvent> &getQueue() const
     {
         return queue_;
     }
@@ -158,15 +150,12 @@ private: // net Thread
         {
             try
             {
-                // Блокирует до stop() или до "закончилась работа". :contentReference[oaicite:4]{index=4}
                 io_.run();
             }
             catch (...)
             {
-                // лог/обработка исключений по желанию
             }
 
-            // Если нас не просили остановиться — готовимся запускать run() снова
             if (isWorking_.load(std::memory_order_acquire))
             {
                 io_.restart();
@@ -213,3 +202,4 @@ private: // net Thread
         std::cout << "void onError(std::string_view): " << stage << ' ' << ec << '\n';
     }
 };
+
