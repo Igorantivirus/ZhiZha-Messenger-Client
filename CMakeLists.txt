@@ -39,29 +39,33 @@ if(NOT DEFINED EXTERNAL_DIR)
     message(ERROR EXTERNAL_DIR is not defined)
 endif()
 
-set(SOURCE_CPP
-
+set(VENDOR_CPP
   ${EXTERN_DIR}/RmlUi/RmlUi_Platform_SDL.cpp
   ${EXTERN_DIR}/RmlUi/RmlUi_Renderer_SDL.cpp
   ${EXTERN_DIR}/pugixml/pugixml.cpp
-  ${SRC_DIR}/main.cpp 
+)
+
+set(NETWORK_CPP
   ${SRC_DIR}/network/WebSocketClient.cpp
   ${SRC_DIR}/network/WebSocketClientStandalone.cpp
   ${SRC_DIR}/network/Utils/WebSocketSession.cpp
+)
+
+set(PROTOCOL_CPP
   ${SRC_DIR}/protocol/JsonPacker.cpp
   ${SRC_DIR}/protocol/JsonParser.cpp
+)
 
-
-  
-  
+set(APP_CPP
+  ${SRC_DIR}/App/KeyGenerator.cpp
 )
 set(SOURCE_HPP
   # ${SRC_DIR}/Objects.hpp
   # ${SRC_DIR}/CollisionMeneger.hpp
 )
 set(INCLUDE_PATHS
-  ${SRC_DIR}
   ${SRC_DIR}/App
+  ${SRC_DIR}
   ${EXTERN_DIR}
 )
 
@@ -86,22 +90,65 @@ find_package(Freetype CONFIG REQUIRED)
 find_package(RmlUi CONFIG REQUIRED)
 find_package(SDLWrapper CONFIG REQUIRED)
 
-if (ANDROID)
-  find_package(ZLIB REQUIRED)
-  add_library(${PROJECT_NAME} SHARED ${SOURCE_CPP} ${SOURCE_HPP})
-else()
-  add_executable(${PROJECT_NAME} ${SOURCE_CPP} ${SOURCE_HPP})
-endif()
+add_library(clientui_vendor OBJECT ${VENDOR_CPP})
+add_library(clientui_network OBJECT ${NETWORK_CPP})
+add_library(clientui_protocol OBJECT ${PROTOCOL_CPP})
+add_library(clientui_app OBJECT ${APP_CPP})
 
-#--------------------------TARGET--------------------------#
-
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_PATHS})
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE
+add_library(clientui_common INTERFACE)
+target_include_directories(clientui_common INTERFACE
+  ${INCLUDE_PATHS}
+  ${Boost_INCLUDE_DIRS}
+)
+target_compile_definitions(clientui_common INTERFACE
   RMLUI_SDL_VERSION_MAJOR=3
   RMLUI_STATIC_LIB
   SDL_MAIN_USE_CALLBACKS
   ${BUILD_TYPE_MACRO}
+  BOOST_ASIO_NO_DEPRECATED
+  BOOST_BEAST_USE_STD_STRING_VIEW
+)
+
+target_link_libraries(clientui_common INTERFACE
+  SDL3::SDL3
+  SDL3_image::SDL3_image
+  SDL3_mixer::SDL3_mixer
+  SDLWrapper::SDLWrapper
+  RmlUi::RmlUi
+  nlohmann_json::nlohmann_json
+)
+if(ANDROID)
+  target_link_libraries(clientui_common INTERFACE freetype)
+else()
+  target_link_libraries(clientui_common INTERFACE Freetype::Freetype)
+endif()
+
+if(TARGET Boost::system)
+  target_link_libraries(clientui_common INTERFACE Boost::system)
+else()
+  target_link_libraries(clientui_common INTERFACE ${Boost_SYSTEM_LIBRARY})
+endif()
+
+target_link_libraries(clientui_vendor PRIVATE clientui_common)
+target_link_libraries(clientui_network PRIVATE clientui_common)
+target_link_libraries(clientui_protocol PRIVATE clientui_common)
+target_link_libraries(clientui_app PRIVATE clientui_common)
+
+if (ANDROID)
+  find_package(ZLIB REQUIRED)
+  add_library(${PROJECT_NAME} SHARED ${SRC_DIR}/main.cpp ${SOURCE_HPP})
+else()
+  add_executable(${PROJECT_NAME} ${SRC_DIR}/main.cpp ${SOURCE_HPP})
+endif()
+
+#--------------------------TARGET--------------------------#
+
+target_link_libraries(${PROJECT_NAME} PRIVATE clientui_common)
+target_sources(${PROJECT_NAME} PRIVATE
+  $<TARGET_OBJECTS:clientui_vendor>
+  $<TARGET_OBJECTS:clientui_network>
+  $<TARGET_OBJECTS:clientui_protocol>
+  $<TARGET_OBJECTS:clientui_app>
 )
 
 if(ANDROID)
@@ -109,44 +156,7 @@ if(ANDROID)
   target_link_libraries(${PROJECT_NAME} PRIVATE
     android
     log
-    SDL3::SDL3
-    SDL3_image::SDL3_image
-    SDL3_mixer::SDL3_mixer
-    SDLWrapper::SDLWrapper
-    freetype
-    RmlUi::RmlUi
-    nlohmann_json::nlohmann_json
   )
-
-else()
-
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-    SDL3::SDL3
-    SDL3_image::SDL3_image
-    SDL3_mixer::SDL3_mixer
-    SDLWrapper::SDLWrapper
-    Freetype::Freetype
-    RmlUi::RmlUi
-    nlohmann_json::nlohmann_json
-  )
-
-endif()
-
-# Подключаем директории include
-target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-
-# Определения для header-only режима
-target_compile_definitions(${PROJECT_NAME} PRIVATE 
-    BOOST_ASIO_NO_DEPRECATED
-    BOOST_BEAST_USE_STD_STRING_VIEW
-)
-
-# Линкуем только system (beast и asio header-only)
-if(TARGET Boost::system)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Boost::system)
-else()
-    # Для старых версий CMake
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_SYSTEM_LIBRARY})
 endif()
 
 
