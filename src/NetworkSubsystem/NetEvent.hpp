@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost/beast/websocket/rfc6455.hpp>
-#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -39,14 +38,18 @@ public:
     };
 
     template <typename T>
-    std::optional<T> get()
+    const T *getIf() const
     {
-        if (auto *val = std::get_if<T>(&data_))
-            return *val;
-        return std::nullopt;
+        return std::get_if<T>(&data_);
     }
 
-    const Type getType()
+    template <typename T>
+    T *getIf()
+    {
+        return std::get_if<T>(&data_);
+    }
+
+    Type getType() const
     {
         return type_;
     }
@@ -60,8 +63,6 @@ public:
     }
 
 private:
-    
-
-    Type type_;
+    Type type_ = Type::onOpen;
     DataValue data_;
 };
