@@ -53,6 +53,12 @@ public:
 
     void updateEvent(const SDL_Event &event) override
     {
+        if (event.type == SDL_EVENT_KEY_DOWN)
+        {
+            // Проверка нажатия Enter (возврат каретки)
+            if (event.key.key == SDLK_RETURN || event.key.key == SDLK_KP_ENTER)
+                sendMsg();
+        }
     }
 
     void draw(sdl3::RenderWindow &window) const override
@@ -115,7 +121,7 @@ private:
         // <div class="msg-row">
         Rml::Element *row = messanges->AppendChild(doc->CreateElement("div"));
         row->SetClass("msg-row", true);
-        if(userName == appstate.userName)
+        if (userName == appstate.userName)
             row->SetClass("me", true);
         else
             row->SetClass("other", true);
@@ -154,6 +160,8 @@ private:
         mr.chatId = 1;
         mr.userId = appstate.userID;
         mr.message = messageInput->GetAttribute("value")->Get<std::string>();
+        if (mr.message.empty())
+            return;
         messageInput->SetAttribute("value", "");
 
         network.getClient()->sendText(JsonPacker::packChatMessageRequest(mr));
