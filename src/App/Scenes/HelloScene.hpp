@@ -4,7 +4,7 @@
 #include "HardStrings.hpp"
 #include "KeyGenerator.hpp"
 #include "NetworkSubsystem/NetEvent.hpp"
-#include "NetworkSubsystem/NetworkSubsystem.hpp"
+#include "NetworkSubsystem/INetEventListener.hpp"
 #include <Engine/OneRmlDocScene.hpp>
 #include <RmlUi/Core/ElementDocument.h>
 
@@ -14,7 +14,7 @@
 #include "protocol/JsonPacker.hpp"
 #include "protocol/JsonParser.hpp"
 
-class HelloScene : public engine::OneRmlDocScene
+class HelloScene : public engine::OneRmlDocScene, public INetEventListener
 {
 private:
     class HelloSceneListener : public Rml::EventListener
@@ -43,7 +43,7 @@ private:
     };
 
 public:
-    HelloScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::HelloScene::file), listener_(*this), network(args.net()), appstate(args.appState())
+    HelloScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::HelloScene::file), listener_(*this), args_(args), appstate(args.appState())
     {
         loadDocumentOrThrow();
         addEventListener(Rml::EventId::Click, &listener_, true);
@@ -59,17 +59,29 @@ public:
 
     engine::SceneAction update(const float dt) override
     {
-        ThreadSafeQueue<NetEvent> &queue = network.getQueue();
-        auto eventOpt = queue.try_pop();
-        if (!eventOpt.has_value())
-            return engine::OneRmlDocScene::update(dt);
+        return engine::OneRmlDocScene::update(dt);
+    }
 
-        NetEvent &event = *eventOpt;
+    void show() override
+    {
+        engine::OneRmlDocScene::show();
+        if (!netSub_)
+            netSub_ = args_.netEvents().subscribe(*this);
+    }
 
+    void hide() override
+    {
+        netSub_.reset();
+        engine::OneRmlDocScene::hide();
+    }
+
+    void onNetEvent(const NetEvent &event) override
+    {
         if (event.getType() == NetEvent::Type::onOpen)
         {
-            std::string usernameS = username->GetAttribute("value")->Get<std::string>();
-            std::string passwordS = password->GetAttribute("value")->Get<std::string>();
+            const std::string usernameS = username ? username->GetAttribute("value")->Get<std::string>() : std::string{};
+            const std::string passwordS = password ? password->GetAttribute("value")->Get<std::string>() : std::string{};
+            (void)passwordS;
 
             appstate.userName = usernameS;
 
@@ -77,19 +89,20 @@ public:
             reg.clientVersion = "1.0";
             reg.publicKey = "ABOBA";
             reg.username = usernameS;
-            network.getClient()->sendText(JsonPacker::packRegisterRequest(reg));
-            //
+            args_.net().getClient()->sendText(JsonPacker::packRegisterRequest(reg));
         }
-        if (event.getType() == NetEvent::Type::onText)
-            updateServerMsg(event.get<NetEvent::OnText>()->text);
-
-        return engine::OneRmlDocScene::update(dt);
+        else if (event.getType() == NetEvent::Type::onText)
+        {
+            if (const auto *t = event.getIf<NetEvent::OnText>())
+                updateServerMsg(t->text);
+        }
     }
 
 private:
     HelloSceneListener listener_;
-    NetworkSubsystem &network;
-    AppState& appstate;
+    const ClientArguments &args_;
+    AppState &appstate;
+    NetEventHub::Subscription netSub_;
 
     Rml::Element *username = nullptr;
     Rml::Element *server = nullptr;
@@ -113,7 +126,7 @@ private:
         // reg.publicKey = "ABOBA";
         // reg.username = usernameS;
 
-        network.getClient()->start(std::move(url));
+        args_.net().getClient()->start(std::move(url));
     }
 
     void updateServerMsg(const std::string& s)

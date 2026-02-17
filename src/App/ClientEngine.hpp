@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NetworkSubsystem/NetEvent.hpp"
+#include "NetworkSubsystem/ThreadSafeQueue.hpp"
 #include <App/ClientArguments.hpp>
 #include <Engine/Engine.hpp>
 
@@ -9,6 +11,7 @@ public:
 private:
     ClientArguments args_;
     NetworkSubsystem subsystem_;
+    NetEventHub netHub_;
 
 private:
     engine::Arguments &arguments() override
@@ -27,6 +30,7 @@ private:
         if (!clientArgs)
             return;
         clientArgs->network = &subsystem_;
+        clientArgs->netHub = &netHub_;
     }
 
     bool initOptionalSubsystems(const engine::EngineSettings &setts) override
@@ -42,5 +46,14 @@ private:
 
     void updateOptionalSubsystems() override
     {
+        // Incoming: net thread -> queue -> main thread hub.
+        ThreadSafeQueue<NetEvent> &queue = subsystem_.getQueue();
+        while(!queue.empty())
+        {
+            auto evOpt = queue.try_pop();
+            if (!evOpt.has_value())
+                break;
+            netHub_.dispatch(*evOpt);
+        }
     }
 };

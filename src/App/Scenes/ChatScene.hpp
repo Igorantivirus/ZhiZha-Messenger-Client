@@ -3,7 +3,7 @@
 #include "AppState.hpp"
 #include "KeyGenerator.hpp"
 #include "NetworkSubsystem/NetEvent.hpp"
-#include "NetworkSubsystem/NetworkSubsystem.hpp"
+#include "NetworkSubsystem/INetEventListener.hpp"
 #include <Engine/OneRmlDocScene.hpp>
 #include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
@@ -16,7 +16,7 @@
 #include "protocol/JsonPacker.hpp"
 #include "protocol/JsonParser.hpp"
 
-class ChatScene : public engine::OneRmlDocScene
+class ChatScene : public engine::OneRmlDocScene, public INetEventListener
 {
 private:
     class ChatSceneListener : public Rml::EventListener
@@ -45,7 +45,7 @@ private:
     };
 
 public:
-    ChatScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::ChatScene::file), listener_(*this), network(args.net()), appstate(args.appState())
+    ChatScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::ChatScene::file), listener_(*this), args_(args), appstate(args.appState())
     {
         loadDocumentOrThrow();
         addEventListener(Rml::EventId::Click, &listener_, true);
@@ -67,38 +67,36 @@ public:
 
     engine::SceneAction update(const float dt) override
     {
-        ThreadSafeQueue<NetEvent> &queue = network.getQueue();
-        auto eventOpt = queue.try_pop();
-        if (!eventOpt.has_value())
-            return engine::OneRmlDocScene::update(dt);
+        return engine::OneRmlDocScene::update(dt);
+    }
 
-        NetEvent &event = *eventOpt;
+    void show() override
+    {
+        engine::OneRmlDocScene::show();
+        if (!netSub_)
+            netSub_ = args_.netEvents().subscribe(*this);
+    }
 
+    void hide() override
+    {
+        netSub_.reset();
+        engine::OneRmlDocScene::hide();
+    }
+
+    void onNetEvent(const NetEvent &event) override
+    {
         if (event.getType() == NetEvent::Type::onText)
         {
-            onMsg(event.get<NetEvent::OnText>()->text);
+            if (const auto *t = event.getIf<NetEvent::OnText>())
+                onMsg(t->text);
         }
-
-        // if (event.getType() == NetEvent::Type::onOpen)
-        // {
-        //     std::string usernameS = username->GetAttribute("value")->Get<std::string>();
-        //     std::string passwordS = password->GetAttribute("value")->Get<std::string>();
-
-        //     ClientRegisterRequest reg;
-        //     reg.clientVersion = "1.0";
-        //     reg.publicKey = "ABOBA";
-        //     reg.username = usernameS;
-        //     network.getClient()->sendText(JsonPacker::packRegisterRequest(reg));
-        //     actionRes_ = engine::SceneAction::nextAction(1);
-        // }
-
-        return engine::OneRmlDocScene::update(dt);
     }
 
 private:
     ChatSceneListener listener_;
-    NetworkSubsystem &network;
+    const ClientArguments &args_;
     AppState &appstate;
+    NetEventHub::Subscription netSub_;
 
     Rml::Element *messageInput = nullptr;
     Rml::Element *messanges = nullptr;
@@ -164,6 +162,6 @@ private:
             return;
         messageInput->SetAttribute("value", "");
 
-        network.getClient()->sendText(JsonPacker::packChatMessageRequest(mr));
+        args_.net().getClient()->sendText(JsonPacker::packChatMessageRequest(mr));
     }
 };
