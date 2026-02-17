@@ -181,15 +181,15 @@ private: // net Thread
         std::cout << "void onOpen()" << '\n';
     }
 
-    void onText(std::string_view s)
+    void onText(std::string s)
     {
         NetEvent ev;
-        ev.setData(NetEvent::OnText{.text = std::string(s)}, NetEvent::Type::onText);
+        ev.setData(NetEvent::OnText{.text = std::move(s)}, NetEvent::Type::onText);
         queue_.push(std::move(ev));
         std::cout << "onText(std::string_view s): " << s << '\n';
     }
 
-    void onByte(std::span<const std::uint8_t> bytes)
+    void onByte(std::vector<std::uint8_t> bytes)
     {
         std::cout << "onByte(std::span<const std::uint8_t> bytes): " << '\n';
     }

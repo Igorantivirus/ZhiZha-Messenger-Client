@@ -2,8 +2,6 @@
 
 #include <cstdint>
 #include <functional>
-#include <span>
-#include <string_view>
 #include <utility>
 
 #include <boost/beast/core/error.hpp>
@@ -19,8 +17,8 @@ class NetworkEvents
 {
 public:
     using OnOpen = std::function<void()>;
-    using OnText = std::function<void(std::string_view)>;
-    using OnBytes = std::function<void(std::span<const std::uint8_t>)>;
+    using OnText = std::function<void(std::string)>;
+    using OnBytes = std::function<void(std::vector<std::uint8_t>)>;
     using OnClose = std::function<void(boost::beast::websocket::close_reason)>;
     using OnError = std::function<void(std::string_view stage, boost::beast::error_code ec)>;
 
