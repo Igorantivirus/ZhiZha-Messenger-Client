@@ -2,8 +2,8 @@
 
 #include "AppState.hpp"
 #include "KeyGenerator.hpp"
-#include "NetworkSubsystem/NetEvent.hpp"
-#include "NetworkSubsystem/INetEventListener.hpp"
+#include <App/NetworkSubsystem/NetEvent.hpp>
+#include <App/NetworkSubsystem/INetEventListener.hpp>
 #include <Engine/OneRmlDocScene.hpp>
 #include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
@@ -45,7 +45,7 @@ private:
     };
 
 public:
-    ChatScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::ChatScene::file), listener_(*this), args_(args), appstate(args.appState())
+    ChatScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::ChatScene::file), listener_(*this), args_(args)
     {
         loadDocumentOrThrow();
         addEventListener(Rml::EventId::Click, &listener_, true);
@@ -95,7 +95,6 @@ public:
 private:
     ChatSceneListener listener_;
     const ClientArguments &args_;
-    AppState &appstate;
     NetEventHub::Subscription netSub_;
 
     Rml::Element *messageInput = nullptr;
@@ -119,7 +118,7 @@ private:
         // <div class="msg-row">
         Rml::Element *row = messanges->AppendChild(doc->CreateElement("div"));
         row->SetClass("msg-row", true);
-        if (userName == appstate.userName)
+        if (userName == args_.appState().userName)
             row->SetClass("me", true);
         else
             row->SetClass("other", true);
@@ -156,7 +155,7 @@ private:
             return;
         ClientChatMessageRequest mr;
         mr.chatId = 1;
-        mr.userId = appstate.userID;
+        mr.userId = args_.appState().userID;
         mr.message = messageInput->GetAttribute("value")->Get<std::string>();
         if (mr.message.empty())
             return;

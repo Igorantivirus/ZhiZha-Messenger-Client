@@ -3,15 +3,16 @@
 #include <cassert>
 
 #include <Engine/Arguments.hpp>
-#include <NetworkSubsystem/NetworkSubsystem.hpp>
-#include <NetworkSubsystem/NetEventHub.hpp>
-#include "AppState.hpp"
+#include <App/NetworkSubsystem/NetworkSubsystem.hpp>
+#include <App/NetworkSubsystem/NetEventHub.hpp>
+
+#include "AppContext.hpp"
 
 struct ClientArguments : public engine::Arguments
 {
     NetworkSubsystem *network = nullptr;
     NetEventHub *netHub = nullptr;
-    mutable AppState appstate;
+    AppContext *app = nullptr;
 
     NetworkSubsystem &net() const
     {
@@ -25,8 +26,14 @@ struct ClientArguments : public engine::Arguments
         return *netHub;
     }
 
-    AppState& appState() const
+    AppContext &appContext() const
     {
-        return appstate;
+        assert(app && "ClientArguments::app is null");
+        return *app;
+    }
+
+    AppState &appState() const
+    {
+        return appContext().state();
     }
 };

@@ -3,8 +3,8 @@
 #include "AppState.hpp"
 #include "HardStrings.hpp"
 #include "KeyGenerator.hpp"
-#include "NetworkSubsystem/NetEvent.hpp"
-#include "NetworkSubsystem/INetEventListener.hpp"
+#include <App/NetworkSubsystem/NetEvent.hpp>
+#include <App/NetworkSubsystem/INetEventListener.hpp>
 #include <Engine/OneRmlDocScene.hpp>
 #include <RmlUi/Core/ElementDocument.h>
 
@@ -43,7 +43,7 @@ private:
     };
 
 public:
-    HelloScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::HelloScene::file), listener_(*this), args_(args), appstate(args.appState())
+    HelloScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::HelloScene::file), listener_(*this), args_(args)
     {
         loadDocumentOrThrow();
         addEventListener(Rml::EventId::Click, &listener_, true);
@@ -83,7 +83,7 @@ public:
             const std::string passwordS = password ? password->GetAttribute("value")->Get<std::string>() : std::string{};
             (void)passwordS;
 
-            appstate.userName = usernameS;
+            args_.appState().userName = usernameS;
 
             ClientRegisterRequest reg;
             reg.clientVersion = "1.0";
@@ -101,7 +101,6 @@ public:
 private:
     HelloSceneListener listener_;
     const ClientArguments &args_;
-    AppState &appstate;
     NetEventHub::Subscription netSub_;
 
     Rml::Element *username = nullptr;
@@ -144,7 +143,7 @@ private:
         {
             auto request = JsonParser::parseServerRegistrationPayload(*jsonPayload);
             
-            appstate.userID = request->userId;
+            args_.appState().userID = request->userId;
             actionRes_ = engine::SceneAction::nextAction(1);
         }
     }
