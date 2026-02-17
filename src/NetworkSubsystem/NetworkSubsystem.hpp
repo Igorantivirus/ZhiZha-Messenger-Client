@@ -186,12 +186,15 @@ private: // net Thread
         NetEvent ev;
         ev.setData(NetEvent::OnText{.text = std::move(s)}, NetEvent::Type::onText);
         queue_.push(std::move(ev));
-        std::cout << "onText(std::string_view s): " << s << '\n';
+        std::cout << "onText(std::string): received" << '\n';
     }
 
     void onByte(std::vector<std::uint8_t> bytes)
     {
-        std::cout << "onByte(std::span<const std::uint8_t> bytes): " << '\n';
+        NetEvent ev;
+        ev.setData(NetEvent::OnBytes{.bytes = std::move(bytes)}, NetEvent::Type::onBytes);
+        queue_.push(std::move(ev));
+        std::cout << "onBytes(std::vector<uint8_t>): received" << '\n';
     }
 
     void onClose(boost::beast::websocket::close_reason reason)
