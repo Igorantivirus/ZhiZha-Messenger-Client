@@ -71,7 +71,7 @@ void WebSocketSession::emitText(std::string msg)
     if (!events_.on_text)
         return;
     auto cb = events_.on_text;
-    net::post(callback_ex_, [cb = std::move(cb), msg = std::move(msg)]() mutable { cb(msg); });
+    net::post(callback_ex_, [cb = std::move(cb), msg = std::move(msg)]() mutable { cb(std::move(msg)); });
 }
 
 void WebSocketSession::emitBytes(std::vector<std::uint8_t> data)
@@ -80,7 +80,7 @@ void WebSocketSession::emitBytes(std::vector<std::uint8_t> data)
         return;
     auto cb = events_.on_bytes;
     net::post(callback_ex_, [cb = std::move(cb), data = std::move(data)]() mutable {
-        cb(data);
+        cb(std::move(data));
     });
 }
 
