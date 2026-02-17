@@ -1,68 +1,176 @@
 body {
-    background-color: rgb(173, 216, 230);
-
-    font-family: "DejaVu Sans";
-    font-size: 20px;
-
     margin: 0px;
     width: 100%;
     height: 100%;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    font-family: "DejaVu Sans";
+    font-size: 18dp;
+    color: #1f1f1f;
 
-    padding: 30px 30px 30px 30px;
+    background-color: rgb(173, 216, 230);
 
-    box-sizing: border-box;
+    padding: 24dp 24dp 24dp 24dp;
 }
 
-/*HEADER*/
+#scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#content {
+    width: 560dp;
+    max-width: 100%;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ===== Header ===== */
 .head {
-    width: auto;
+    margin-bottom: 18dp;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 12dp 16dp;
 
-    padding: 15px 15px 15px 15px;
-    margin-bottom: 30px;
-
-    background-color: rgba(255, 255, 255, 89);
-
-    border-width: 2px;
-    border-color: rgba(0, 0, 0, 89);
-    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 90);
+    border: 2dp black;
+    border-radius: 16dp;
 }
 
 .head p {
     margin: 0px;
-    color: black;
 
-    /* вместо 700% — предсказуемый размер */
-    font-size: 50px;
+    font-size: 40dp;
     font-weight: bold;
+
+    text-align: center;
+
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* ===== Card ===== */
+.card {
+    padding: 14dp;
+
+    background-color: #fff9f3;
+    border: 2dp black;
+    border-radius: 12dp;
+
+    box-sizing: border-box;
+}
+
+.label {
+    margin: 0px 0px 12dp 0px;
+
+    padding: 8dp 12dp;
+
+    background-color: rgb(0, 255, 255);
+    border: 2dp black;
+    border-radius: 10dp;
+
+    font-size: 18dp;
     text-align: center;
 }
 
-/*FOOTER*/
-.footer {
+.info-input {
+    padding: 8dp 6dp;
+    box-sizing: border-box;
+}
+
+.info-input p {
+    margin: 0px 0px 6dp 0px;
+    font-size: 16dp;
+
+    white-space: normal;
+    word-break: break-word;
+}
+
+input[type=text],
+input[type=password] {
     width: 100%;
+    height: 36dp;
 
-    margin-top: auto;
+    padding: 6dp 10dp;
+    box-sizing: border-box;
 
-    padding: 13px 13px 13px 13px;
+    border: 2dp black;
+    border-radius: 8dp;
+
+    background-color: #ffffff;
+    color: #1f1f1f;
+
+    font-size: 14dp;
+}
+
+/* ===== Buttons ===== */
+.primary-button span {
+    pointer-events: none;
+    width: 100%;
+	text-align: center;
+	pointer-events: none;
+}
+
+.primary-button {
+    margin-top: 10dp;
+
+    width: 100%;
+    height: 40dp;
+
+    border: 2dp black;
+    border-radius: 10dp;
+
+    background-color: rgb(0, 90, 255);
+    color: white;
+
+    font-size: 16dp;
+    text-align: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.primary-button:hover {
+    background-color: rgb(0, 75, 195);
+}
+
+.primary-button:active {
+    background-color: rgb(53, 160, 0);
+}
+
+.secondary-button {
+    height: 36dp;
+    padding: 6dp 14dp;
+
+    border: 2dp black;
+    border-radius: 10dp;
+
+    background-color: #ffffff;
+    color: black;
+}
+
+.secondary-button:hover {
+    background-color: #efefef;
+}
+
+/* ===== Footer ===== */
+.footer {
+    margin-top: 18dp;
+    padding: 10dp 4dp;
 
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    box-sizing: border-box;
 }
 
 .footer p {
     width: 50%;
-    color: black;
-    font-size: 20px;
+    margin: 0px;
+
+    font-size: 16dp;
+
+    white-space: normal;
+    word-break: break-word;
 }
 
 .version {
@@ -73,93 +181,63 @@ body {
     text-align: right;
 }
 
-/*MAIN*/
-
-.main {
-    width: 50%;
-    min-width: 250px;
-    height: auto;
-
-    padding: 10px 10px 10px 10px;
-
-    background-color: #fff9f3;
-    border: 2px black;
-    border-radius: 10px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-
-    color: black;
-}
-
-.main .label {
-    background-color: rgb(0, 255, 255);
-    border: 1px black;
-    border-radius: 10px;
-    padding: 10px 10px 10px 10px;
-}
-
-
-input[type=text] {
-    display: block;
-
-    width: 75%;
-    padding: 6px 10px;
-    margin: 5px 0 15px;
-
-    border: 1px black;
-
-    border-radius: 5px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.info-input {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    padding: 10px 10px 10px 10px;
-}
-
-/* input[type=text]:focus { */
-/* border-color: #4d90fe; */
-/* outline: none; */
-/* box-shadow: 0 0 5px #4d90fe; */
-/* } */
-
-input[type=text]:invalid:not(:placeholder-shown) {
-    border-color: #d9534f;
-    background-color: #fdf7f7;
-}
-
-input[type=text]::placeholder {
-    color: black;
-}
-
-.connect-button span { pointer-events: none; }
-
-.connect-button {
+/* ===== Notice overlay ===== */
+#notice_overlay {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    padding: 10px 20px 10px 20px;
-
-    color: black;
-
-    background-color: blue;
-    border: 2px black;
-    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 60);
 }
 
-.connect-button:hover {
-    background-color: rgb(0, 75, 195);
+/* ВАЖНО: это гарантированно перебивает display:flex */
+#notice_overlay.hidden {
+    display: none;
 }
 
-.connect-button:active {
-    background-color: rgb(53, 160, 0);
+#notice_panel {
+    width: 460dp;
+    max-width: 92%;
+
+    padding: 12dp;
+
+    border: 2dp black;
+    border-radius: 12dp;
+
+    background-color: #ffffff;
+
+    box-sizing: border-box;
+}
+
+#notice_title {
+    padding: 8dp 10dp;
+    border-bottom: 2dp black;
+
+    background-color: #fafafa;
+
+    font-size: 18dp;
+    font-weight: bold;
+}
+
+#notice_text {
+    padding: 12dp 10dp;
+
+    font-size: 16dp;
+
+    white-space: normal;
+    word-break: break-word;
+}
+
+#notice_footer {
+    padding-top: 10dp;
+    border-top: 2dp black;
+
+    display: flex;
+    justify-content: flex-end;
 }
