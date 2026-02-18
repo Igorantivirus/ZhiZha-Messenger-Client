@@ -1,0 +1,45 @@
+#message-panel {
+    width: 460dp;
+    max-width: 92%;
+
+    padding: 12dp;
+
+    border: 2dp black;
+    border-radius: 12dp;
+
+    background-color: #ffffff;
+
+    box-sizing: border-box;
+
+    /* display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; */
+}
+
+#message-tittle {
+    padding: 8dp 10dp;
+    border-bottom: 2dp black;
+
+    background-color: #fafafa;
+
+    font-size: 18dp;
+    font-weight: bold;
+}
+
+#message-text {
+    padding: 12dp 10dp;
+
+    font-size: 16dp;
+
+    white-space: normal;
+    word-break: break-word;
+}
+
+#message-footer {
+    padding-top: 10dp;
+    border-top: 2dp black;
+
+    display: flex;
+    justify-content: flex-end;
+}

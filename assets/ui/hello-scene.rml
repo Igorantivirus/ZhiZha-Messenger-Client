@@ -1,8 +1,12 @@
 <rml lang="ru">
+
 	<head>
 		<title>ZhiZha Messenger</title>
 		<link type="text/rcss" href="rml.rcss" />
 		<link type="text/rcss" href="hello-scene.rcss" />
+		<link type="text/rcss" href="overlays/overlay.rcss" />
+
+		<link type="text/template" href="overlays/message-overlay.rml" />
 	</head>
 
 	<body>
@@ -11,54 +15,42 @@
 			<!-- Скролл появляется только при необходимости -->
 			<div id="content">
 
-					<div class="head">
-						<p>ZhiZha Messenger</p>
-					</div>
-
-					<div class="card">
-						<p class="label">Авторизация</p>
-
-						<div class="info-input">
-							<p>Код сервера для подключения</p>
-							<input type="text" id="server" value="" maxlength="64" size="30" />
-						</div>
-
-						<div class="info-input">
-							<p>Имя пользователя</p>
-							<input type="text" id="username" value="" maxlength="30" size="30" />
-						</div>
-
-						<div class="info-input">
-							<p>Пароль</p>
-							<input type="password" id="password" value="" maxlength="64" size="30" />
-						</div>
-
-						<button id="connect-btn" class="primary-button">
-							<span>Войти</span>
-						</button>
-					</div>
-
-					<div class="footer">
-						<p class="version">v - 0.1.0</p>
-						<p class="author">by Igorantivirus</p>
-					</div>
-
+				<div class="head">
+					<p>ZhiZha Messenger</p>
 				</div>
+
+				<div class="card">
+					<p class="label">Авторизация</p>
+
+					<div class="info-input">
+						<p>Код сервера для подключения</p>
+						<input type="text" id="server" value="" maxlength="64" size="30" />
+					</div>
+
+					<div class="info-input">
+						<p>Имя пользователя</p>
+						<input type="text" id="username" value="" maxlength="30" size="30" />
+					</div>
+
+					<div class="info-input">
+						<p>Пароль</p>
+						<input type="password" id="password" value="" maxlength="64" size="30" />
+					</div>
+
+					<button id="connect-btn" class="primary-button">
+						<span>Войти</span>
+					</button>
+				</div>
+
+				<div class="footer">
+					<p class="version">v - 0.1.0</p>
+					<p class="author">by Igorantivirus</p>
+				</div>
+
+			</div>
 
 			<!-- Панель уведомлений/ошибок (по умолчанию скрыта) -->
-			<div id="notice_overlay" class="hidden">
-				<div id="notice_panel">
-					<div id="notice_title">Сообщение</div>
-
-					<div id="notice_text">
-						Тут будет текст ошибки/уведомления.
-					</div>
-
-					<div id="notice_footer">
-						<button id="notice_ok_btn" class="secondary-button">Ok</button>
-					</div>
-				</div>
-			</div>
+			<template src="message-overlay"></template>
 
 		</div>
 	</body>

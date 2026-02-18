@@ -1,0 +1,26 @@
+<template name="message-overlay" content="slot">
+    <!--
+    It is necessary to connect:
+    "overlays/overlay.rcss"
+    This is done so that styles are not duplicated when connecting two overlays.
+    -->
+
+    <head>
+        <link type="text/rcss" href="message-overlay.rcss" />
+    </head>
+
+    <body>
+        <div id="message-overlay" class="overlay hidden">
+            <div id="message-panel">
+                <div id="message-tittle">Сообщение</div>
+
+                <div id="message-text">Текст</div>
+
+                <div id="message-footer">
+                    <button id="notice_ok_btn" class="secondary-button">Ok</button>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</template>

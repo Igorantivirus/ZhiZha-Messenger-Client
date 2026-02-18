@@ -9,7 +9,6 @@ body {
 
     background-color: rgb(173, 216, 230);
 
-    padding: 24dp 24dp 24dp 24dp;
 }
 
 #scene {
@@ -31,6 +30,7 @@ body {
     margin-bottom: 18dp;
 
     padding: 12dp 16dp;
+    margin-top: 24dp;
 
     background-color: rgba(255, 255, 255, 90);
     border: 2dp black;
@@ -179,65 +179,4 @@ input[type=password] {
 
 .author {
     text-align: right;
-}
-
-/* ===== Notice overlay ===== */
-#notice_overlay {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background-color: rgba(0, 0, 0, 60);
-}
-
-/* ВАЖНО: это гарантированно перебивает display:flex */
-#notice_overlay.hidden {
-    display: none;
-}
-
-#notice_panel {
-    width: 460dp;
-    max-width: 92%;
-
-    padding: 12dp;
-
-    border: 2dp black;
-    border-radius: 12dp;
-
-    background-color: #ffffff;
-
-    box-sizing: border-box;
-}
-
-#notice_title {
-    padding: 8dp 10dp;
-    border-bottom: 2dp black;
-
-    background-color: #fafafa;
-
-    font-size: 18dp;
-    font-weight: bold;
-}
-
-#notice_text {
-    padding: 12dp 10dp;
-
-    font-size: 16dp;
-
-    white-space: normal;
-    word-break: break-word;
-}
-
-#notice_footer {
-    padding-top: 10dp;
-    border-top: 2dp black;
-
-    display: flex;
-    justify-content: flex-end;
 }

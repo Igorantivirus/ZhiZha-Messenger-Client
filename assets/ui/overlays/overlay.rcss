@@ -1,0 +1,18 @@
+/* ===== Notice overlay ===== */
+.overlay {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: rgba(0, 0, 0, 60);
+}
+
+.overlay.hidden {
+    display: none;
+}
