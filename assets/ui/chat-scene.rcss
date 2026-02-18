@@ -31,16 +31,40 @@ body {
 }
 
 #sidebar_header {
-	padding: 10px;
-	border-bottom: 2px black;
+    padding: 10px;
+    border-bottom: 2px black;
 
-	font-size: 18px;
-	background-color: #fafafa;
+    font-size: 18px;
+    background-color: #fafafa;
+
+    display: flex;
+    justify-content: space-between;  /* РАЗМЕЩАЕТ ТЕКСТ СЛЕВА, КНОПКУ СПРАВА */
+    align-items: center;             /* ВЫРАВНИВАЕТ ПО ВЕРТИКАЛИ (опционально, но лучше смотрится) */
+}
+
+#server-leave {
+    /* width: auto; - можно убрать, это значение по умолчанию */
+    padding: 5px 5px;
+
+    border: 2px black;
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    background-color: #e8f1ff;
+    
+    /* Убираем лишние отступы, которые могут быть у кнопки по умолчанию */
+    margin: 0;
+}
+#server-leave:active
+{
+	background-color: #659bf3;
 }
 
 #chat_list {
 	flex: 1;
-	height: 0px; /* важно для скролла внутри flex */
+	height: 0px;
+	/* важно для скролла внутри flex */
 	padding: 10px;
 
 	overflow-y: scroll;
@@ -145,7 +169,8 @@ body {
 
 #messages {
 	flex: 1;
-	height: 0px; /* важно для скролла внутри flex */
+	height: 0px;
+	/* важно для скролла внутри flex */
 	padding: 12px;
 
 	overflow-y: scroll;
@@ -217,6 +242,7 @@ body {
 .msg-row.me #messages .msg {
 	background-color: #e8f1ff;
 }
+
 /* (если селектор выше где-то не сработает из-за специфичности, есть дубль ниже) */
 .msg-row.me .msg {
 	background-color: #e8f1ff;
@@ -252,6 +278,8 @@ body {
 	border-radius: 8px;
 
 	background-color: #e8f1ff;
+
+	margin-left: auto;
 }
 
 #send_button:hover {
@@ -305,7 +333,8 @@ body {
 
 #user_list {
 	flex: 1;
-	height: 0px; /* важно для скролла внутри flex */
+	height: 0px;
+	/* важно для скролла внутри flex */
 	padding: 10px;
 
 	overflow-y: scroll;

@@ -24,17 +24,17 @@
 
 					<div class="info-input">
 						<p>Код сервера для подключения</p>
-						<input type="text" id="server" value="" maxlength="64" size="30" />
+						<input type="text" id="server" value="10.241.69.217:18080/ws" maxlength="64" size="30" />
 					</div>
 
 					<div class="info-input">
 						<p>Имя пользователя</p>
-						<input type="text" id="username" value="" maxlength="30" size="30" />
+						<input type="text" id="username" value="Igor" maxlength="30" size="30" />
 					</div>
 
 					<div class="info-input">
 						<p>Пароль</p>
-						<input type="password" id="password" value="" maxlength="64" size="30" />
+						<input type="password" id="password" value="Negr" maxlength="64" size="30" />
 					</div>
 
 					<button id="connect-btn" class="primary-button">
