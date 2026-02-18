@@ -14,6 +14,7 @@ public:
         doc_ = &document;
         messanges_ = document.GetElementById("messages");
         chatList_ = document.GetElementById("chat_list");
+        currentChatName_  = document.GetElementById("chat_name");
     }
 
     void initChatList(const std::map<IDType, std::string> &chats)
@@ -31,7 +32,7 @@ public:
 
     bool isBound() const
     {
-        return doc_ && messanges_ && chatList_;
+        return doc_ && messanges_ && chatList_ && currentChatName_;
     }
 
     void sendMessage(const IDType chatID, const std::string &userName, const std::string &text, bool isMe)
@@ -77,7 +78,7 @@ public:
         auto found = chatLabels_.find(&id);
         if(found != chatLabels_.end())
         {
-            makeChatActibe(id, found->second);
+            makeChatActive(id, found->second);
             return true;
         }
         return false;
@@ -101,6 +102,7 @@ private:
     // By string id
     std::unordered_map<const std::string *, Rml::Element *> chatLabels_;
     Rml::Element *activeElement = nullptr;
+    Rml::Element *currentChatName_ = nullptr;
     IDType activeChatID_ = 0;//aero -- is invalid
 
 private:
@@ -128,12 +130,26 @@ private:
         chatLabels_[&chatItem->GetId()] = chatItem;
     }
 
-    void makeChatActibe(const std::string& id, Rml::Element* chat)
+    void makeChatActive(const std::string& id, Rml::Element* chat)
     {
+        if(!isBound())
+            return;
+
         if(activeElement)
             activeElement->SetClass("active", false);
         activeElement = chat;
         activeElement->SetClass("active", true);
         activeChatID_ = std::stoul(id);
+        
+        for(std::size_t i = 0; i < activeElement->GetNumChildren(); ++i)
+        {
+            auto elem = activeElement->GetChild(i);
+            if(elem->IsClassSet("chat-title"))
+            {
+                currentChatName_->SetInnerRML(elem->GetInnerRML());
+                break;
+            }
+        }
+        
     }
 };

@@ -32,6 +32,7 @@ public:
 
     struct ChatMessageReceived
     {
+        IDType chatID;
         std::string userName;
         std::string message;
     };

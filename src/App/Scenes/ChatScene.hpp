@@ -6,10 +6,12 @@
 #include <Engine/OneRmlDocScene.hpp>
 #include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
+#include <boost/beast/websocket/rfc6455.hpp>
 #include <string>
 
 #include "App/HardStrings.hpp"
 #include "ClientArguments.hpp"
+#include "Core/Types.hpp"
 
 #include <UI/ChatPanel.hpp>
 
@@ -31,9 +33,15 @@ private:
                 return;
 
             const Rml::String &id = el->GetId();
+            if(scene_.chatPanel.updateClickEvent(id, el))
+                return;
             if (id == "send_button")
             {
                 scene_.sendMsg();
+            }
+            else if(id == "server-leave")
+            {
+                scene_.leaveFromServer();
             }
         }
 
@@ -82,13 +90,20 @@ public:
 
     void onAppEvent(const AppEvent &event) override
     {
-        if (event.getType() != AppEvent::Type::ChatMessageReceived)
-            return;
-        const auto *m = event.getIf<AppEvent::ChatMessageReceived>();
-        if (!m)
-            return;
-
-        chatPanel.sendMessage(m->userName, m->message, m->userName == args_.appState().userName);
+        if (event.getType() == AppEvent::Type::ChatMessageReceived)
+        {
+            const auto *m = event.getIf<AppEvent::ChatMessageReceived>();
+            if (!m)
+                return;
+            chatPanel.sendMessage(m->chatID, m->userName, m->message, m->userName == args_.appState().userName);
+        }
+        else if (event.getType() == AppEvent::Type::ChatsPayload)
+        {
+            const auto *m = event.getIf<AppEvent::ChatsPayload>();
+            if (!m)
+                return;
+            chatPanel.initChatList(args_.appState().chats);
+        }
     }
 
 private:
@@ -97,8 +112,7 @@ private:
     AppEventHub::Subscription appSub_;
 
     Rml::Element *messageInput = nullptr;
-    
-    
+
     ChatPanel chatPanel;
 
 private:
@@ -109,14 +123,21 @@ private:
         args_.appContext().chat().sendChatsRequest();
     }
 
+    void leaveFromServer()
+    {
+        args_.net().getClient()->stop(ws::websocket::close_code::normal, "user leave from server");
+        actionRes_ = engine::SceneAction::popAction();
+    }
+
     void sendMsg()
     {
-        if (!messageInput)
+        if (!messageInput || chatPanel.getActiveChatID() == 0)
             return;
         const std::string msg = messageInput->GetAttribute("value")->Get<std::string>();
         if (msg.empty())
             return;
         messageInput->SetAttribute("value", "");
-        args_.appContext().chat().sendMessage(msg);
+        const IDType id = chatPanel.getActiveChatID();
+        args_.appContext().chat().sendMessage(msg, id);
     }
 };

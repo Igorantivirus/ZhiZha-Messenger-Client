@@ -23,7 +23,7 @@ public:
         events_ = &events;
     }
 
-    void sendMessage(const std::string &text, const int chatId = 1)
+    void sendMessage(const std::string &text, const IDType chatId)
     {
         assert(state_ && net_ && "ChatService is not wired");
 
@@ -68,7 +68,7 @@ public:
             if (!request)
                 return;
             AppEvent ev;
-            ev.setData(AppEvent::ChatMessageReceived{.userName = request->userName, .message = request->message}, AppEvent::Type::ChatMessageReceived);
+            ev.setData(AppEvent::ChatMessageReceived{.chatID = request->chatId, .userName = request->userName, .message = request->message}, AppEvent::Type::ChatMessageReceived);
             events_->dispatch(ev);
         }
         else if (typeopt.value() == "chats-payload")
