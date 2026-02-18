@@ -1,9 +1,8 @@
 #pragma once
 
-#include "AppState.hpp"
-#include "KeyGenerator.hpp"
-#include <App/NetworkSubsystem/NetEvent.hpp>
-#include <App/NetworkSubsystem/INetEventListener.hpp>
+#include <App/Events/AppEvent.hpp>
+#include <App/Events/AppEventHub.hpp>
+#include <App/Events/IAppEventListener.hpp>
 #include <Engine/OneRmlDocScene.hpp>
 #include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
@@ -11,12 +10,8 @@
 
 #include "App/HardStrings.hpp"
 #include "ClientArguments.hpp"
-#include "network/Utils/WsUrl.hpp"
-#include "protocol/JsonMessages.hpp"
-#include "protocol/JsonPacker.hpp"
-#include "protocol/JsonParser.hpp"
 
-class ChatScene : public engine::OneRmlDocScene, public INetEventListener
+class ChatScene : public engine::OneRmlDocScene, public IAppEventListener
 {
 private:
     class ChatSceneListener : public Rml::EventListener
@@ -73,29 +68,30 @@ public:
     void show() override
     {
         engine::OneRmlDocScene::show();
-        if (!netSub_)
-            netSub_ = args_.netEvents().subscribe(*this);
+        if (!appSub_)
+            appSub_ = args_.appContext().events().subscribe(*this);
     }
 
     void hide() override
     {
-        netSub_.reset();
+        appSub_.reset();
         engine::OneRmlDocScene::hide();
     }
 
-    void onNetEvent(const NetEvent &event) override
+    void onAppEvent(const AppEvent &event) override
     {
-        if (event.getType() == NetEvent::Type::onText)
-        {
-            if (const auto *t = event.getIf<NetEvent::OnText>())
-                onMsg(t->text);
-        }
+        if (event.getType() != AppEvent::Type::ChatMessageReceived)
+            return;
+        const auto *m = event.getIf<AppEvent::ChatMessageReceived>();
+        if (!m)
+            return;
+        sendToChat(m->userName, m->message);
     }
 
 private:
     ChatSceneListener listener_;
     const ClientArguments &args_;
-    NetEventHub::Subscription netSub_;
+    AppEventHub::Subscription appSub_;
 
     Rml::Element *messageInput = nullptr;
     Rml::Element *messanges = nullptr;
@@ -123,44 +119,28 @@ private:
         else
             row->SetClass("other", true);
 
+        Rml::Element* msgStack = row->AppendChild(doc->CreateElement("div"));
+        msgStack->SetClass("msg-stack", true);
+
+        //   <div class="msg-name">
+        Rml::Element *msgName = msgStack->AppendChild(doc->CreateElement("div"));
+        msgName->SetClass("msg-name", true);
+        msgName->AppendChild(doc->CreateTextNode(userName));
+
         //   <div class="msg">
-        Rml::Element *msg = row->AppendChild(doc->CreateElement("div"));
+        Rml::Element *msg = msgStack->AppendChild(doc->CreateElement("div"));
         msg->SetClass("msg", true);
-
-        //     Принято.
-        msg->AppendChild(doc->CreateTextNode(userName + ": " + text));
-    }
-
-    void onMsg(const std::string &s)
-    {
-        const auto jsonPayload = JsonParser::parseJson(s);
-        if (!jsonPayload.has_value())
-            return;
-
-        const auto typeopt = JsonParser::parseMessageType(*jsonPayload);
-        if (!typeopt.has_value())
-            return;
-        const std::string &type = typeopt.value();
-
-        if (type == "chat-msg")
-        {
-            auto request = JsonParser::parseServerChatMessagePayload(*jsonPayload);
-            sendToChat(request->userName, request->message);
-        }
+        msg->AppendChild(doc->CreateTextNode(text));
     }
 
     void sendMsg()
     {
         if (!messageInput)
             return;
-        ClientChatMessageRequest mr;
-        mr.chatId = 1;
-        mr.userId = args_.appState().userID;
-        mr.message = messageInput->GetAttribute("value")->Get<std::string>();
-        if (mr.message.empty())
+        const std::string msg = messageInput->GetAttribute("value")->Get<std::string>();
+        if (msg.empty())
             return;
         messageInput->SetAttribute("value", "");
-
-        args_.net().getClient()->sendText(JsonPacker::packChatMessageRequest(mr));
+        args_.appContext().chat().sendMessage(msg);
     }
 };
