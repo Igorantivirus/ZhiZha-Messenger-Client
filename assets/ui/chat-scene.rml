@@ -41,37 +41,7 @@
 				</div>
 			</div>
 
-			<div id="messages">
-				<!-- OTHER -->
-				<div class="msg-row other">
-					<div class="msg-stack">
-						<div class="msg-name">Иван</div>
-						<div class="msg">Привет! Ты на месте?</div>
-					</div>
-				</div>
-
-				<!-- ME -->
-				<div class="msg-row me">
-					<div class="msg-stack">
-						<div class="msg-name">Я</div>
-						<div class="msg">Да, привет 🙂 Что нужно?</div>
-					</div>
-				</div>
-
-				<div class="msg-row other">
-					<div class="msg-stack">
-						<div class="msg-name">Иван</div>
-						<div class="msg">Скинь, пожалуйста, апдейт по задаче. И ещё: длинный текст чтобы проверить переносы и поведение пузыря сообщений внутри максимальной ширины.</div>
-					</div>
-				</div>
-
-				<div class="msg-row me">
-					<div class="msg-stack">
-						<div class="msg-name">Я</div>
-						<div class="msg">Сделал основу. Сейчас добавил панель создания группы и кнопки в хедере.</div>
-					</div>
-				</div>
-			</div>
+			<div id="messages"></div>
 
 			<div id="composer">
 				<input id="message_input" type="text" value=""/>
