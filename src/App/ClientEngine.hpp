@@ -60,9 +60,8 @@ private:
         while(!queue.empty())
         {
             auto evOpt = queue.try_pop();
-            if (!evOpt.has_value())
-                break;
-            netHub_.dispatch(*evOpt);
+            if (evOpt.has_value())
+                netHub_.dispatch(*evOpt);
         }
     }
 };
