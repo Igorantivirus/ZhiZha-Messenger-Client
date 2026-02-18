@@ -1,71 +1,48 @@
-<h1 align="center">Объединялы</h1>
+# Client-UI (Messenger2)
 
-<p align="center">
-  <img src="assets/ico.png" alt="Unions logo" width="160" />
-</p>
+Простой клиентский мессенджер: UI-приложение на C++ с сетевым подключением и базовым чатом.
 
-## Кроссплатформенная простая игра
+## Стандарт C++
 
-[![English version](https://img.shields.io/badge/English%20version-blue)](README_EN.md)
+- C++23 (`CMAKE_CXX_STANDARD=23`)
 
-## Описание
+## Возможности (на текущем этапе)
 
-Легковесная кроссплатформенная игра - убивалка времени
+- Регистрация/подключение к серверу
+- Отправка и приём сообщений чата
+- UI на RmlUi (HTML/CSS-подобная разметка)
 
-Объединяйте одинаковые объекты для получения объектов нового уровня.
+## Архитектура (коротко)
 
-## Скриншоты
+- `App` — сценарии (use-cases), сервисы и UI-сцены
+- `Engine` — базовый движок приложения/сцен
+- `Core` — общие типы/утилиты
+- `network` — WebSocket-клиент и сессии (транспорт)
+- `protocol` — JSON-парсинг/пакетирование сообщений
 
-<table>
-  <tr>
-    <td align="center"><img src="screenshots/mainmenu.jpg" width="240" /><br/><sub>Главное меню</sub></td>
-    <td align="center"><img src="screenshots/settings.jpg" width="240" /><br/><sub>Настройки</sub></td>
-    <td align="center"><img src="screenshots/pause.jpg" width="240" /><br/><sub>Пауза</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="screenshots/moneys.jpg" width="240" /><br/><sub>Уровень с монетами</sub></td>
-    <td align="center"><img src="screenshots/gameover.jpg" width="240" /><br/><sub>Конец игры</sub></td>
-    <td></td>
-  </tr>
-</table>
+В `App` бизнес-логика вынесена в сервисы (например `RegistrationService`, `ChatService`), которые обрабатывают сетевые события и публикуют события для UI через `AppEventHub`. Сцены подписываются на `AppEventHub` и обновляют интерфейс (Rml DOM).
 
-# Доступные платформы:
+## Используемые библиотеки
 
-1. Windows (`Unions-Game-win64.zip` файл в релизах)
-2. Android (`Unions-Game-*.apk` файлы в релизах)
+- SDL3 / SDL3_image / SDL3_mixer — окно/рендер/ввод/аудио
+- SDLWrapper — C++-обёртка над SDL3
+- RmlUi — UI (RML/RCSS)
+- FreeType — рендеринг шрифтов
+- Boost (system, asio/beast) — сеть/вспомогательные компоненты
+- nlohmann_json — JSON
+- pugixml — XML (вендорится в `extern/`)
 
-## Доступные уровни
+## Сборка (CMake)
 
-На данный момент в игре доступны уровни:
-1) С монетами ЦБ РФ
-2) С Фруктами
-3) С планетами
+Проект использует CMake Presets (`CMakePresets.json`). Библиотеки подтягиваются через `find_package(...)` и/или внешнюю директорию `EXTERNAL_DIR` (см. пресеты).
 
-## Установка и запуск
+Пример (Windows):
 
-### Windows
+```powershell
+cmake --preset win-debug
+cmake --build build
+```
 
-* Скачайте `Unions-Game-win64.zip` (файл в релизах)
-* Разархивируйте его в удобное для вас место
-* Запустите `Unions.exe`
+## Лицензия
 
-### Android
-
-* Скачайте `Unions-Game-*.apk` (файл в релизах)
-* Установите APK (может потребоваться разрешить установку из неизвестных источников)
-* Запустите игру
-
-
-## Используемые библиотеки:
-* [SDL3 3.4.0, SDL3_image 3.4.0, SDL3_mixer 3.1.2](https://github.com/libsdl-org) - Графическая библиотека + аудио (SDL_mixer)
-* [SDLWrapper 0.2.0](https://github.com/Igorantivirus/SDL_Wrapper) - С++ ООП обёртка над SDL3
-* [RmlUi 6.2](https://github.com/mikke89/RmlUi) - Библиотека для html-style интерфейса
-* [FreeType 2.14.1](https://freetype.org/) - Библиотека для поддержки шрифтов
-* [pugixml 1.15](https://github.com/zeux/pugixml) - Библиотека для работы с xml файлами
-* [Box2D 2.4.2](https://github.com/erincatto/box2d) - Библиотека физического движка
-
-## Используемые шрифты:
-* DejaVu Sans
-
-## Лицензия 
-MIT Лицензия
+MIT License — см. файл `LICENSE`.
