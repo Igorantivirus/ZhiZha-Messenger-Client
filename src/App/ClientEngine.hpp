@@ -4,6 +4,7 @@
 #include <App/NetworkSubsystem/ThreadSafeQueue.hpp>
 #include <App/ClientArguments.hpp>
 #include <App/AppContext.hpp>
+#include <App/NetworkSubsystem/NetEventHub.hpp>
 #include <Engine/Engine.hpp>
 
 class ClientEngine : public engine::Engine
@@ -14,6 +15,7 @@ private:
     AppContext app_;
     NetworkSubsystem subsystem_;
     NetEventHub netHub_;
+    NetEventHub::Subscription appNetSub_;
 
 private:
     engine::Arguments &arguments() override
@@ -34,16 +36,20 @@ private:
         clientArgs->network = &subsystem_;
         clientArgs->netHub = &netHub_;
         clientArgs->app = &app_;
+        app_.bindNetwork(subsystem_);
     }
 
     bool initOptionalSubsystems(const engine::EngineSettings &setts) override
     {
         subsystem_.start();
+        if (!appNetSub_)
+            appNetSub_ = netHub_.subscribe(app_.netListener());
         return true;
     }
 
     void shutdownOptionalSubsystems() override
     {
+        appNetSub_.reset();
         subsystem_.stop();
     }
 
