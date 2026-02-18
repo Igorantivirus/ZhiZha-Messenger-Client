@@ -1,9 +1,9 @@
 #pragma once
 
-#include <cstdint>
 #include <utility>
 #include <vector>
 
+#include "Core/Types.hpp"
 #include "INetEventListener.hpp"
 
 class NetEvent;
@@ -16,7 +16,7 @@ public:
     {
     public:
         Subscription() = default;
-        Subscription(NetEventHub &hub, std::uint64_t id) : hub_(&hub), id_(id) {}
+        Subscription(NetEventHub &hub, IDType id) : hub_(&hub), id_(id) {}
 
         Subscription(const Subscription &) = delete;
         Subscription &operator=(const Subscription &) = delete;
@@ -47,17 +47,17 @@ public:
 
     private:
         NetEventHub *hub_ = nullptr;
-        std::uint64_t id_ = 0;
+        IDType id_ = 0;
     };
 
     Subscription subscribe(INetEventListener &listener)
     {
-        const std::uint64_t id = nextId_++;
+        const IDType id = nextId_++;
         listeners_.push_back(Entry{id, &listener});
         return Subscription(*this, id);
     }
 
-    void unsubscribe(const std::uint64_t id)
+    void unsubscribe(const IDType id)
     {
         if (id == 0)
             return;
@@ -83,10 +83,8 @@ public:
     {
         dispatching_ = true;
         for (const auto &e : listeners_)
-        {
             if (e.ptr)
                 e.ptr->onNetEvent(ev);
-        }
         dispatching_ = false;
 
         // Compact any listeners removed during dispatch.
@@ -102,11 +100,11 @@ public:
 private:
     struct Entry
     {
-        std::uint64_t id{};
+        IDType id{};
         INetEventListener *ptr{};
     };
 
-    std::uint64_t nextId_ = 1;
+    IDType nextId_ = 1;
     std::vector<Entry> listeners_;
     bool dispatching_ = false;
 };
