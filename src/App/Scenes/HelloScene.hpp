@@ -1,20 +1,16 @@
 #pragma once
 
-#include "AppState.hpp"
 #include "HardStrings.hpp"
-#include "KeyGenerator.hpp"
-#include <App/NetworkSubsystem/NetEvent.hpp>
-#include <App/NetworkSubsystem/INetEventListener.hpp>
+#include <App/Events/AppEvent.hpp>
+#include <App/Events/AppEventHub.hpp>
+#include <App/Events/IAppEventListener.hpp>
 #include <Engine/OneRmlDocScene.hpp>
+#include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
 
 #include "ClientArguments.hpp"
-#include "network/Utils/WsUrl.hpp"
-#include "protocol/JsonMessages.hpp"
-#include "protocol/JsonPacker.hpp"
-#include "protocol/JsonParser.hpp"
 
-class HelloScene : public engine::OneRmlDocScene, public INetEventListener
+class HelloScene : public engine::OneRmlDocScene, public IAppEventListener
 {
 private:
     class HelloSceneListener : public Rml::EventListener
@@ -35,6 +31,10 @@ private:
             if (id == "connect-btn")
             {
                 scene_.tryConnect();
+            }
+            else if (id == "notice_ok_btn")
+            {
+                scene_.closeMessageOverlay();
             }
         }
 
@@ -65,47 +65,34 @@ public:
     void show() override
     {
         engine::OneRmlDocScene::show();
-        if (!netSub_)
-            netSub_ = args_.netEvents().subscribe(*this);
+        if (!appSub_)
+            appSub_ = args_.appContext().events().subscribe(*this);
     }
 
     void hide() override
     {
-        netSub_.reset();
+        appSub_.reset();
         engine::OneRmlDocScene::hide();
     }
 
-    void onNetEvent(const NetEvent &event) override
+    void onAppEvent(const AppEvent &event) override
     {
-        if (event.getType() == NetEvent::Type::onOpen)
+        if (event.getType() == AppEvent::Type::RegisterSucceeded)
         {
-            const std::string usernameS = username ? username->GetAttribute("value")->Get<std::string>() : std::string{};
-            const std::string passwordS = password ? password->GetAttribute("value")->Get<std::string>() : std::string{};
-            (void)passwordS;
-
-            args_.appState().userName = usernameS;
-
-            ClientRegisterRequest reg;
-            reg.clientVersion = "1.0";
-            reg.publicKey = "ABOBA";
-            reg.username = usernameS;
-            args_.net().getClient()->sendText(JsonPacker::packRegisterRequest(reg));
+            const auto *ok = event.getIf<AppEvent::RegisterSucceeded>();
+            if (!ok)
+                return;
+            (void)ok;
+            actionRes_ = engine::SceneAction::nextAction(1);
         }
-        else if (event.getType() == NetEvent::Type::onText)
+        else if (event.getType() == AppEvent::Type::RegisterFailed)
         {
-            if (const auto *t = event.getIf<NetEvent::OnText>())
-                updateServerMsg(t->text);
+            const auto *error = event.getIf<AppEvent::RegisterFailed>();
+            if (!error)
+                return;
+            openMessagePanel(error->code, error->message);
         }
     }
-
-private:
-    HelloSceneListener listener_;
-    const ClientArguments &args_;
-    NetEventHub::Subscription netSub_;
-
-    Rml::Element *username = nullptr;
-    Rml::Element *server = nullptr;
-    Rml::Element *password = nullptr;
 
 private:
     void onDocumentLoaded(Rml::ElementDocument &doc) override
@@ -113,38 +100,45 @@ private:
         username = doc.GetElementById("username");
         server = doc.GetElementById("server");
         password = doc.GetElementById("password");
+
+        messageOverlay = doc.GetElementById("message-overlay");
+        messageTittle = doc.GetElementById("message-tittle");
+        message = doc.GetElementById("message-text");
     }
 
     void tryConnect()
     {
-        std::string serverS = server->GetAttribute("value")->Get<std::string>();
-        ws::WsUrl url = KeyGenerator::fromKey(serverS);
+        const std::string usernameS = username ? username->GetAttribute("value")->Get<std::string>() : std::string{};
+        const std::string serverS = server ? server->GetAttribute("value")->Get<std::string>() : std::string{};
+        const std::string passwordS = password ? password->GetAttribute("value")->Get<std::string>() : std::string{};
+        (void)passwordS;
 
-        // ClientRegisterRequest reg;
-        // reg.clientVersion = "1.0";
-        // reg.publicKey = "ABOBA";
-        // reg.username = usernameS;
-
-        args_.net().getClient()->start(std::move(url));
+        args_.appContext().registration().connectAndRegister(serverS, usernameS, passwordS);
     }
 
-    void updateServerMsg(const std::string& s)
+private:
+    HelloSceneListener listener_;
+    const ClientArguments &args_;
+    AppEventHub::Subscription appSub_;
+
+    Rml::Element *username = nullptr;
+    Rml::Element *server = nullptr;
+    Rml::Element *password = nullptr;
+
+    Rml::Element *messageOverlay = nullptr;
+    Rml::Element *messageTittle = nullptr;
+    Rml::Element *message = nullptr;
+
+private:
+    void openMessagePanel(const std::string &tittle, const std::string &msg)
     {
-        const auto jsonPayload = JsonParser::parseJson(s);
-        if (!jsonPayload.has_value())
-            return;
+        messageOverlay->SetClass("hidden", false);
+        messageTittle->SetInnerRML(tittle);
+        message->SetInnerRML(msg);
+    }
 
-        const auto typeopt = JsonParser::parseMessageType(*jsonPayload);
-        if (!typeopt.has_value())
-            return;
-        const std::string &type = typeopt.value();
-
-        if (type == "register-result")
-        {
-            auto request = JsonParser::parseServerRegistrationPayload(*jsonPayload);
-            
-            args_.appState().userID = request->userId;
-            actionRes_ = engine::SceneAction::nextAction(1);
-        }
+    void closeMessageOverlay()
+    {
+        messageOverlay->SetClass("hidden", true);
     }
 };
