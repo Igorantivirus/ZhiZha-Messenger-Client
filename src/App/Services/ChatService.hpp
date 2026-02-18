@@ -37,6 +37,14 @@ public:
         net_->getClient()->sendText(JsonPacker::packChatMessageRequest(mr));
     }
 
+    void sendChatsRequest()
+    {
+        ClientDataRequest req;
+        req.dataType = "chats";
+        req.userId = state_->userID;
+        net_->getClient()->sendText(JsonPacker::packDataRequest(req));
+    }
+
     void onNetEvent(const NetEvent &event)
     {
         if (!events_ || event.getType() != NetEvent::Type::onText)
@@ -54,17 +62,27 @@ public:
         if (!typeopt.has_value())
             return;
 
-        if (typeopt.value() != "chat-msg")
-            return;
+        if (typeopt.value() == "chat-msg")
+        {
+            auto request = JsonParser::parseServerChatMessagePayload(*jsonPayload);
+            if (!request)
+                return;
+            AppEvent ev;
+            ev.setData(AppEvent::ChatMessageReceived{.userName = request->userName, .message = request->message}, AppEvent::Type::ChatMessageReceived);
+            events_->dispatch(ev);
+        }
+        else if (typeopt.value() == "chats-payload")
+        {
+            auto request = JsonParser::parseServerChatsRequestPayload(*jsonPayload);
+            if (!request)
+                return;
 
-        auto request = JsonParser::parseServerChatMessagePayload(*jsonPayload);
-        if (!request)
-            return;
+            state_->chats = request->chats;
 
-        AppEvent ev;
-        ev.setData(AppEvent::ChatMessageReceived{.userName = request->userName, .message = request->message},
-                   AppEvent::Type::ChatMessageReceived);
-        events_->dispatch(ev);
+            AppEvent ev;
+            ev.setData(AppEvent::ChatsPayload{}, AppEvent::Type::ChatsPayload);
+            events_->dispatch(ev);
+        }
     }
 
 private:
@@ -72,4 +90,3 @@ private:
     NetworkSubsystem *net_ = nullptr;
     AppEventHub *events_ = nullptr;
 };
-

@@ -11,6 +11,8 @@
 #include "App/HardStrings.hpp"
 #include "ClientArguments.hpp"
 
+#include <UI/ChatPanel.hpp>
+
 class ChatScene : public engine::OneRmlDocScene, public IAppEventListener
 {
 private:
@@ -85,7 +87,8 @@ public:
         const auto *m = event.getIf<AppEvent::ChatMessageReceived>();
         if (!m)
             return;
-        sendToChat(m->userName, m->message);
+
+        chatPanel.sendMessage(m->userName, m->message, m->userName == args_.appState().userName);
     }
 
 private:
@@ -94,43 +97,16 @@ private:
     AppEventHub::Subscription appSub_;
 
     Rml::Element *messageInput = nullptr;
-    Rml::Element *messanges = nullptr;
+    
+    
+    ChatPanel chatPanel;
 
 private:
     void onDocumentLoaded(Rml::ElementDocument &doc) override
     {
         messageInput = doc.GetElementById("message_input");
-        messanges = doc.GetElementById("messages");
-    }
-
-    void sendToChat(const std::string &userName, const std::string &text)
-    {
-        if (!messanges)
-            return;
-        Rml::ElementDocument *doc = document();
-        if (!doc)
-            return;
-
-        // <div class="msg-row">
-        Rml::Element *row = messanges->AppendChild(doc->CreateElement("div"));
-        row->SetClass("msg-row", true);
-        if (userName == args_.appState().userName)
-            row->SetClass("me", true);
-        else
-            row->SetClass("other", true);
-
-        Rml::Element* msgStack = row->AppendChild(doc->CreateElement("div"));
-        msgStack->SetClass("msg-stack", true);
-
-        //   <div class="msg-name">
-        Rml::Element *msgName = msgStack->AppendChild(doc->CreateElement("div"));
-        msgName->SetClass("msg-name", true);
-        msgName->AppendChild(doc->CreateTextNode(userName));
-
-        //   <div class="msg">
-        Rml::Element *msg = msgStack->AppendChild(doc->CreateElement("div"));
-        msg->SetClass("msg", true);
-        msg->AppendChild(doc->CreateTextNode(text));
+        chatPanel.bind(doc);
+        args_.appContext().chat().sendChatsRequest();
     }
 
     void sendMsg()

@@ -15,6 +15,7 @@ public:
         ChatMessageReceived,
         ConnectionClosed,
         ConnectionError,
+        ChatsPayload
     };
 
     struct RegisterSucceeded
@@ -46,7 +47,11 @@ public:
         std::string message;
     };
 
-    using DataValue = std::variant<RegisterSucceeded, RegisterFailed, ChatMessageReceived, ConnectionClosed, ConnectionError>;
+    struct ChatsPayload
+    {
+    };
+
+    using DataValue = std::variant<RegisterSucceeded, RegisterFailed, ChatMessageReceived, ConnectionClosed, ConnectionError, ChatsPayload>;
 
     template <typename T>
     const T *getIf() const
@@ -69,4 +74,3 @@ private:
     Type type_ = Type::ConnectionError;
     DataValue data_{ConnectionError{}};
 };
-

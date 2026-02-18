@@ -4,6 +4,7 @@
 #include <App/Events/AppEvent.hpp>
 #include <App/Events/AppEventHub.hpp>
 #include <App/Events/IAppEventListener.hpp>
+#include <App/UI/MessageOverlay.hpp>
 #include <Engine/OneRmlDocScene.hpp>
 #include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
@@ -26,16 +27,13 @@ private:
                 el = el->GetParentNode();
             if (!el)
                 return;
-
             const Rml::String &id = el->GetId();
+
+            if (scene_.messageOverlay_.handleClickId(id))
+                return;
+
             if (id == "connect-btn")
-            {
                 scene_.tryConnect();
-            }
-            else if (id == "notice_ok_btn")
-            {
-                scene_.closeMessageOverlay();
-            }
         }
 
     private:
@@ -90,7 +88,7 @@ public:
             const auto *error = event.getIf<AppEvent::RegisterFailed>();
             if (!error)
                 return;
-            openMessagePanel(error->code, error->message);
+            messageOverlay_.open(error->code, error->message);
         }
     }
 
@@ -100,10 +98,7 @@ private:
         username = doc.GetElementById("username");
         server = doc.GetElementById("server");
         password = doc.GetElementById("password");
-
-        messageOverlay = doc.GetElementById("message-overlay");
-        messageTittle = doc.GetElementById("message-tittle");
-        message = doc.GetElementById("message-text");
+        messageOverlay_.bind(doc);
     }
 
     void tryConnect()
@@ -125,20 +120,5 @@ private:
     Rml::Element *server = nullptr;
     Rml::Element *password = nullptr;
 
-    Rml::Element *messageOverlay = nullptr;
-    Rml::Element *messageTittle = nullptr;
-    Rml::Element *message = nullptr;
-
-private:
-    void openMessagePanel(const std::string &tittle, const std::string &msg)
-    {
-        messageOverlay->SetClass("hidden", false);
-        messageTittle->SetInnerRML(tittle);
-        message->SetInnerRML(msg);
-    }
-
-    void closeMessageOverlay()
-    {
-        messageOverlay->SetClass("hidden", true);
-    }
+    MessageOverlay messageOverlay_;
 };
