@@ -107,11 +107,11 @@ public:
         return client_;
     }
 
-    template <class F>
-    void post(F &&f)
-    {
-        boost::asio::post(io_, std::forward<F>(f));
-    }
+    // template <class F>
+    // void post(F &&f)
+    // {
+    //     boost::asio::post(io_, std::forward<F>(f));
+    // }
 
     ThreadSafeQueue<NetEvent> &getQueue()
     {
@@ -172,12 +172,12 @@ private: // net Thread
 
     void onText(std::string s)
     {
+        std::cout << "onText(std::string): " << s << '\n';
         NetEvent ev;
         ev.setData(NetEvent::OnText{.text = std::move(s)}, NetEvent::Type::onText);
         queue_.push(std::move(ev));
-        std::cout << "onText(std::string): received" << '\n';
     }
-
+    
     void onByte(std::vector<std::uint8_t> bytes)
     {
         NetEvent ev;
