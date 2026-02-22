@@ -1,8 +1,10 @@
 #pragma once
 
+#include "ClientArguments.hpp"
 #include "Core/Types.hpp"
 #include <RmlUi/Core/Element.h>
 #include <RmlUi/Core/ElementDocument.h>
+#include <RmlUi/Core/Elements/ElementFormControlInput.h>
 #include <map>
 #include <string>
 
@@ -10,6 +12,9 @@
 class CreateGroupOverlay
 {
 public:
+    CreateGroupOverlay(const ClientArguments& args) : args_(args)
+    {}
+
     void bind(Rml::ElementDocument &doc)
     {
         doc_ = &doc;
@@ -17,11 +22,13 @@ public:
         createB_  = doc.GetElementById("create-group-btn");
         backB_ = doc.GetElementById("cancel-group-btn");
         userList_ = doc.GetElementById("user-list");
+        roomNameInput_ = doc.GetElementById("room-name");
+        isPrivateCheck_ = dynamic_cast<Rml::ElementFormControlInput*>(doc.GetElementById("private-room"));
     }
 
     bool isBound() const
     {
-        return doc_ && overlay_ && createB_ && backB_;
+        return doc_ && overlay_ && createB_ && backB_ && roomNameInput_ && isPrivateCheck_;
     }
 
     void open(const std::map<IDType, std::string> &users)
@@ -29,8 +36,11 @@ public:
         if (!isBound())
             return;
         overlay_->SetClass("hidden", false);
-        // title_->SetInnerRML(title);
-        // text_->SetInnerRML(msg);
+        userLabels_.clear();
+        userList_->SetInnerRML("");
+        for(const auto& [id, name] : users)
+            createUser(name, id);
+
     }
 
     void close()
@@ -52,8 +62,10 @@ public:
         }
         if(el == createB_)
         {
-            close();
-            return true;
+            bool res = tryCreate();
+            if(res)
+                close();
+            return res;
         }
         auto found = userLabels_.find(&id);
         if(found == userLabels_.end())
@@ -69,10 +81,34 @@ private:
     Rml::Element *createB_ = nullptr;
     Rml::Element *backB_ = nullptr;
     Rml::Element *userList_ = nullptr;
+    Rml::Element *roomNameInput_ = nullptr;
+    Rml::ElementFormControlInput* isPrivateCheck_ = nullptr;
 
     std::unordered_map<const std::string *, Rml::Element *> userLabels_;
 
+    const ClientArguments& args_;
+
 private:
+
+    bool tryCreate()
+    {
+        std::string roomName = roomNameInput_->GetAttribute("value")->Get<std::string>();
+        if(roomName.empty())
+            return false;
+
+        bool isPrivate = isPrivateCheck_->GetValue() == "on";
+        std::vector<IDType> users;
+        for(const auto& [idP, el] : userLabels_)
+            if(el->IsClassSet("selected"))
+                users.push_back(el->GetAttribute("user-id")->Get<IDType>());
+
+        if(users.empty())
+            return false;
+
+        args_.appContext().chat().sendCreateRoomRequest(isPrivate, std::move(users), std::move(roomName));
+
+        return true;
+    }
 
     void changeSelected(Rml::Element *el)
     {
@@ -89,6 +125,7 @@ private:
         userItem->SetClass("user-item", true);
         userItem->SetClass("selected", false);
         userItem->SetId("user-to-add-" + std::to_string(id));
+        userItem->SetAttribute("user-id", id);
         userItem->SetInnerRML(name);
 
         userLabels_[&userItem->GetId()] = userItem;
