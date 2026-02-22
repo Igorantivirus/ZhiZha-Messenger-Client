@@ -1,6 +1,7 @@
 #include "protocol/JsonPacker.hpp"
 
 #include <nlohmann/json.hpp>
+#include <string>
 
 using json = nlohmann::json;
 
@@ -142,6 +143,22 @@ std::string JsonPacker::packRequestChatsPayload(const ServerChatsRequestPayload 
 {
     json chatsJson = json::object();
     for (const auto &[chatId, chatName] : payload.chats)
+    {
+        // JSON object keys are strings by definition.
+        chatsJson[std::to_string(chatId)] = chatName;
+    }
+
+    return json{
+        {"type", payload.type},
+        {"chats", std::move(chatsJson)},
+    }
+        .dump();
+}
+
+std::string JsonPacker::packRequestUsersPayload(const ServerUsersRequestPayload& payload)
+{
+    json chatsJson = json::object();
+    for (const auto &[chatId, chatName] : payload.users)
     {
         // JSON object keys are strings by definition.
         chatsJson[std::to_string(chatId)] = chatName;
