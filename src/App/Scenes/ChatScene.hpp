@@ -14,6 +14,7 @@
 #include "Core/Types.hpp"
 
 #include <UI/ChatPanel.hpp>
+#include <UI/CreateGroupOverlay.hpp>
 
 class ChatScene : public engine::OneRmlDocScene, public IAppEventListener
 {
@@ -35,6 +36,8 @@ private:
             const Rml::String &id = el->GetId();
             if(scene_.chatPanel.updateClickEvent(id, el))
                 return;
+            if(scene_.createGroupOverlay_.updateClickEvent(id, el))
+                return;
             if (id == "send_button")
             {
                 scene_.sendMsg();
@@ -42,6 +45,10 @@ private:
             else if(id == "server-leave")
             {
                 scene_.leaveFromServer();
+            }
+            else if(id == "open_group_panel")
+            {
+                scene_.startCreateRoom();
             }
         }
 
@@ -114,13 +121,17 @@ private:
     Rml::Element *messageInput = nullptr;
 
     ChatPanel chatPanel;
+    CreateGroupOverlay createGroupOverlay_;
 
+    
 private:
     void onDocumentLoaded(Rml::ElementDocument &doc) override
     {
         messageInput = doc.GetElementById("message_input");
         chatPanel.bind(doc);
+        createGroupOverlay_.bind(doc);
         args_.appContext().chat().sendChatsRequest();
+        args_.appContext().chat().sendUsersRequest();
     }
 
     void leaveFromServer()
@@ -139,5 +150,10 @@ private:
         messageInput->SetAttribute("value", "");
         const IDType id = chatPanel.getActiveChatID();
         args_.appContext().chat().sendMessage(msg, id);
+    }
+
+    void startCreateRoom()
+    {
+        createGroupOverlay_.open(args_.appContext().state().users);
     }
 };

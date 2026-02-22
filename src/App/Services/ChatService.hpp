@@ -45,6 +45,14 @@ public:
         net_->getClient()->sendText(JsonPacker::packDataRequest(req));
     }
 
+    void sendUsersRequest()
+    {
+        ClientDataRequest req;
+        req.dataType = "users";
+        req.userId = state_->userID;
+        net_->getClient()->sendText(JsonPacker::packDataRequest(req));
+    }
+
     void onNetEvent(const NetEvent &event)
     {
         if (!events_ || event.getType() != NetEvent::Type::onText)
@@ -81,6 +89,18 @@ public:
 
             AppEvent ev;
             ev.setData(AppEvent::ChatsPayload{}, AppEvent::Type::ChatsPayload);
+            events_->dispatch(ev);
+        }
+        else if (typeopt.value() == "users-payload")
+        {
+            auto request = JsonParser::parseServerUsersRequestPayload(*jsonPayload);
+            if (!request)
+                return;
+
+            state_->users = request->users;
+
+            AppEvent ev;
+            ev.setData(AppEvent::UsersPayload{}, AppEvent::Type::UsersPayload);
             events_->dispatch(ev);
         }
     }
