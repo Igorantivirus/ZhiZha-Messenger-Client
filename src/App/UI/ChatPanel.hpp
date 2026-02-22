@@ -24,7 +24,7 @@ public:
 
         chatList_->SetInnerRML("");
         chatLabels_.clear();
-        activeElement = nullptr;
+        activeChatLabel_ = nullptr;
 
         for (const auto &[id, name] : chats)
             addChat(id, name, false);
@@ -84,9 +84,9 @@ public:
         return false;
     }
 
-    const Rml::Element *getActiveElement() const
+    const Rml::Element *getActiveChatLabel() const
     {
-        return activeElement;
+        return activeChatLabel_;
     }
 
     const IDType getActiveChatID() const
@@ -101,9 +101,12 @@ private:
 
     // By string id
     std::unordered_map<const std::string *, Rml::Element *> chatLabels_;
-    Rml::Element *activeElement = nullptr;
+    Rml::Element *activeChatLabel_ = nullptr;
     Rml::Element *currentChatName_ = nullptr;
     IDType activeChatID_ = 0;//aero -- is invalid
+
+
+    std::unordered_map<IDType, std::string> chatMessages_;
 
 private:
     void addChat(const IDType id, const std::string &name, bool active)
@@ -135,15 +138,20 @@ private:
         if(!isBound())
             return;
 
-        if(activeElement)
-            activeElement->SetClass("active", false);
-        activeElement = chat;
-        activeElement->SetClass("active", true);
-        activeChatID_ = std::stoul(id);
+        if(activeChatLabel_)
+            activeChatLabel_->SetClass("active", false);
+        if(activeChatID_ != 0)
+            chatMessages_[activeChatID_] = messanges_->GetInnerRML();
         
-        for(std::size_t i = 0; i < activeElement->GetNumChildren(); ++i)
+
+        activeChatLabel_ = chat;
+        activeChatLabel_->SetClass("active", true);
+        activeChatID_ = std::stoul(id);
+        messanges_->SetInnerRML(chatMessages_[activeChatID_]);
+
+        for(std::size_t i = 0; i < activeChatLabel_->GetNumChildren(); ++i)
         {
-            auto elem = activeElement->GetChild(i);
+            auto elem = activeChatLabel_->GetChild(i);
             if(elem->IsClassSet("chat-title"))
             {
                 currentChatName_->SetInnerRML(elem->GetInnerRML());
