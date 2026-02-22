@@ -15,7 +15,8 @@ public:
         ChatMessageReceived,
         ConnectionClosed,
         ConnectionError,
-        ChatsPayload
+        ChatsPayload,
+        UsersPayload
     };
 
     struct RegisterSucceeded
@@ -51,8 +52,11 @@ public:
     struct ChatsPayload
     {
     };
+    struct UsersPayload
+    {
+    };
 
-    using DataValue = std::variant<RegisterSucceeded, RegisterFailed, ChatMessageReceived, ConnectionClosed, ConnectionError, ChatsPayload>;
+    using DataValue = std::variant<RegisterSucceeded, RegisterFailed, ChatMessageReceived, ConnectionClosed, ConnectionError, ChatsPayload, UsersPayload>;
 
     template <typename T>
     const T *getIf() const

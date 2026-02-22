@@ -11,5 +11,6 @@ public:
     IDType userID = 0;
     std::string userName;
     std::map<IDType, std::string> chats;
+    std::map<IDType, std::string> users;
 
 };
