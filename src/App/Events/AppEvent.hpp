@@ -2,6 +2,7 @@
 
 #include <string>
 #include <variant>
+#include <vector>
 
 #include <Core/Types.hpp>
 
@@ -16,7 +17,8 @@ public:
         ConnectionClosed,
         ConnectionError,
         ChatsPayload,
-        UsersPayload
+        UsersPayload,
+        RoomCreated
     };
 
     struct RegisterSucceeded
@@ -56,7 +58,14 @@ public:
     {
     };
 
-    using DataValue = std::variant<RegisterSucceeded, RegisterFailed, ChatMessageReceived, ConnectionClosed, ConnectionError, ChatsPayload, UsersPayload>;
+    struct RoomCreated
+    {
+        IDType chatID;
+        std::vector<IDType> users;
+        std::string name;
+    };
+
+    using DataValue = std::variant<RegisterSucceeded, RegisterFailed, ChatMessageReceived, ConnectionClosed, ConnectionError, ChatsPayload, UsersPayload, RoomCreated>;
 
     template <typename T>
     const T *getIf() const
