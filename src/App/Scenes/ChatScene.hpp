@@ -57,7 +57,7 @@ private:
     };
 
 public:
-    ChatScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::ChatScene::file), listener_(*this), args_(args)
+    ChatScene(const ClientArguments &args) : engine::OneRmlDocScene(args, ui::ChatScene::file), listener_(*this), createGroupOverlay_(args), args_(args)
     {
         loadDocumentOrThrow();
         addEventListener(Rml::EventId::Click, &listener_, true);
@@ -110,6 +110,16 @@ public:
             if (!m)
                 return;
             chatPanel.initChatList(args_.appState().chats);
+        }
+        else if (event.getType() == AppEvent::Type::RoomCreated)
+        {
+            const auto *c = event.getIf<AppEvent::RoomCreated>();
+            if (!c)
+                return;
+            chatPanel.chatCreated(c->chatID, c->name);
+
+
+            // chatPanel.initChatList(args_.appState().chats);
         }
     }
 
