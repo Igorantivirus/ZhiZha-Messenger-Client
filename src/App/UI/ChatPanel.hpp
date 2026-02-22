@@ -6,6 +6,13 @@
 #include <string>
 #include <unordered_map>
 
+struct Message
+{
+    std::string user;
+    std::string msg;
+    bool me = false;
+};
+
 class ChatPanel
 {
 public:
@@ -39,27 +46,14 @@ public:
     {
         if (!isBound())
             return;
-        if (chatID != activeChatID_)
-            return;
+        if (chatID == activeChatID_)
+            addMsgToCurrentChat(text, userName, isMe);
 
-        // <div class="msg-row">
-        Rml::Element *row = messanges_->AppendChild(doc_->CreateElement("div"));
-
-        row->SetClass("msg-row", true);
-        row->SetClass(isMe ? "me" : "other", true);
-
-        Rml::Element *msgStack = row->AppendChild(doc_->CreateElement("div"));
-        msgStack->SetClass("msg-stack", true);
-
-        //   <div class="msg-name">
-        Rml::Element *msgName = msgStack->AppendChild(doc_->CreateElement("div"));
-        msgName->SetClass("msg-name", true);
-        msgName->AppendChild(doc_->CreateTextNode(userName));
-
-        //   <div class="msg">
-        Rml::Element *msg = msgStack->AppendChild(doc_->CreateElement("div"));
-        msg->SetClass("msg", true);
-        msg->AppendChild(doc_->CreateTextNode(text));
+        Message msg;
+        msg.user = userName;
+        msg.msg = text;
+        msg.me = isMe;
+        chatMessages_[chatID].push_back(std::move(msg));
     }
 
     void clearMessanges()
@@ -94,7 +88,7 @@ public:
         return activeChatID_;
     }
 
-    void chatCreated(const IDType chatID, const std::string& name)
+    void chatCreated(const IDType chatID, const std::string &name)
     {
         addChat(chatID, name, false);
     }
@@ -110,9 +104,30 @@ private:
     Rml::Element *currentChatName_ = nullptr;
     IDType activeChatID_ = 0; // aero -- is invalid
 
-    std::unordered_map<IDType, std::string> chatMessages_;
+    std::unordered_map<IDType, std::vector<Message>> chatMessages_;
 
 private:
+    void addMsgToCurrentChat(const std::string text, const std::string &name, const bool isMe)
+    {
+        // <div class="msg-row">
+        Rml::Element *row = messanges_->AppendChild(doc_->CreateElement("div"));
+
+        row->SetClass("msg-row", true);
+        row->SetClass(isMe ? "me" : "other", true);
+
+        Rml::Element *msgStack = row->AppendChild(doc_->CreateElement("div"));
+        msgStack->SetClass("msg-stack", true);
+
+        //   <div class="msg-name">
+        Rml::Element *msgName = msgStack->AppendChild(doc_->CreateElement("div"));
+        msgName->SetClass("msg-name", true);
+        msgName->AppendChild(doc_->CreateTextNode(name));
+
+        //   <div class="msg">
+        Rml::Element *msg = msgStack->AppendChild(doc_->CreateElement("div"));
+        msg->SetClass("msg", true);
+        msg->AppendChild(doc_->CreateTextNode(text));
+    }
 
     void addChat(const IDType id, const std::string &name, bool active)
     {
@@ -145,22 +160,47 @@ private:
 
         if (activeChatLabel_)
             activeChatLabel_->SetClass("active", false);
-        if (activeChatID_ != 0)
-            chatMessages_[activeChatID_] = messanges_->GetInnerRML();
+
+        messanges_->SetInnerRML({});
 
         activeChatLabel_ = chat;
         activeChatLabel_->SetClass("active", true);
         activeChatID_ = std::stoul(id);
-        messanges_->SetInnerRML(chatMessages_[activeChatID_]);
+        
+        auto found = chatMessages_.find(activeChatID_);
+        if(found == chatMessages_.end())
+            return;
+        for(const auto& msg : found->second)
+            addMsgToCurrentChat(msg.msg, msg.user, msg.me);
+        
+        
+        
+        // messanges_->SetInnerRML(chatMessages_[activeChatID_]);
 
-        for (std::size_t i = 0; i < activeChatLabel_->GetNumChildren(); ++i)
-        {
-            auto elem = activeChatLabel_->GetChild(i);
-            if (elem->IsClassSet("chat-title"))
-            {
-                currentChatName_->SetInnerRML(elem->GetInnerRML());
-                break;
-            }
-        }
+        // for (std::size_t i = 0; i < activeChatLabel_->GetNumChildren(); ++i)
+        // {
+        //     auto elem = activeChatLabel_->GetChild(i);
+        //     if (elem->IsClassSet("chat-title"))
+        //     {
+        //         currentChatName_->SetInnerRML(elem->GetInnerRML());
+        //         break;
+        //     }
+        // }
     }
+
+    // void saveCurrent()
+    // {
+    //     if (!isBound() || activeChatID_ == 0)
+    //         return;
+
+    //     std::vector<Message> messages = chatMessages_[activeChatID_];
+    //     messages.clear();
+
+    //     for (int i = 0; i < messanges_->GetNumChildren(); ++i)
+    //     {
+    //         Rml::Element *el = messanges_->GetChild(i);
+    //         Message msg;
+    //         // msg.user
+    //     }
+    // }
 };
