@@ -7,6 +7,7 @@
 #include <App/NetworkSubsystem/NetworkSubsystem.hpp>
 
 #include "AppState.hpp"
+#include "Core/Types.hpp"
 #include "Events/AppEvent.hpp"
 #include "Events/AppEventHub.hpp"
 #include "protocol/JsonMessages.hpp"
@@ -51,6 +52,16 @@ public:
         req.dataType = "users";
         req.userId = state_->userID;
         net_->getClient()->sendText(JsonPacker::packDataRequest(req));
+    }
+
+    void sendCreateRoomRequest(bool isPrivate, std::vector<IDType> users, std::string name)
+    {
+        ClientCreateRoomRequest req;
+        req.isPrivate = isPrivate;
+        req.userId = state_->userID;
+        req.participantUserIds = std::move(users);
+        req.name = std::move(name);
+        net_->getClient()->sendText(JsonPacker::packCreateRoomRequest(req));
     }
 
     void onNetEvent(const NetEvent &event)
@@ -101,6 +112,35 @@ public:
 
             AppEvent ev;
             ev.setData(AppEvent::UsersPayload{}, AppEvent::Type::UsersPayload);
+            events_->dispatch(ev);
+        }
+        else if (typeopt.value() == "user-change")
+        {
+            auto request = JsonParser::parseServerUsersSomeChange(*jsonPayload);
+            if (!request)
+                return;
+
+            if(request->changeType == "registered")
+            {
+                state_->users[request->userId] = request->username;
+            }
+            if(request->changeType == "logout")
+            {
+                state_->users.erase(request->userId);
+            }
+            if(request->changeType == "rename")
+            {
+                state_->users[request->userId] = request->username;
+            }
+        }
+        else if(typeopt.value() == "room-created")
+        {
+            auto request = JsonParser::parseServerRoomCreatedPayload(*jsonPayload);
+            if (!request || !request->created)
+                return;
+
+            AppEvent ev;
+            ev.setData(AppEvent::RoomCreated{.chatID = request->chatId, .users = std::move(request->participantUserIds), .name = request->name}, AppEvent::Type::RoomCreated);
             events_->dispatch(ev);
         }
     }
