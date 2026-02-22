@@ -58,6 +58,17 @@ public:
             return;
         }
 
+        if (event.getType() == NetEvent::Type::onError)
+        {
+            const auto *e = event.getIf<NetEvent::OnError>();
+            if (!e)
+                return;
+            AppEvent ev;
+            ev.setData(AppEvent::RegisterFailed{.code = e->ec.to_string(), .message = e->stage}, AppEvent::Type::RegisterFailed);
+            events_->dispatch(ev); 
+
+        }
+
         if (event.getType() != NetEvent::Type::onText)
             return;
 
