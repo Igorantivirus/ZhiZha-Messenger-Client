@@ -1,0 +1,53 @@
+<template name="create-group-overlay" content="slot">
+    <!--
+    It is necessary to connect:
+    "overlays/overlay.rcss"
+    This is done so that styles are not duplicated when connecting two overlays.
+    -->
+
+    <head>
+        <link type="text/rcss" href="create-group-overlay.rcss" />
+    </head>
+
+    <body>
+        <div id="create-group-overlay" class="overlay hidden">
+            <div id="group-panel">
+                <div id="group-panel-header">Создание группы</div>
+
+                <!-- Top controls -->
+                <div id="group-panel-controls">
+                    <div class="field">
+                        <div class="field-label">Имя комнаты</div>
+                        <input type="text" id="room-name" value="" maxlength="32" size="30" />
+                    </div>
+
+                    <div id="private-row">
+                        <input type="checkbox" id="private-room" class="checkbox" />
+                        <div id="private-label">Приватная комната</div>
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div id="user-list">
+                    <!-- <div class="user-item">Анна</div>
+                    <div class="user-item">Иван</div>
+                    <div class="user-item">Мария</div>
+                    <div class="user-item">Пётр</div>
+                    <div class="user-item">Сергей</div>
+                    <div class="user-item">Ольга</div>
+                    <div class="user-item">Никита</div>
+                    <div class="user-item">Дмитрий</div>
+                    <div class="user-item">Екатерина</div>
+                    <div class="user-item">Алексей</div> -->
+                </div>
+
+                <!-- Footer -->
+                <div id="group-panel-footer">
+                    <button id="cancel-group-btn" class="btn">Отмена</button>
+                    <button id="create-group-btn" class="btn primary">Создать</button>
+                </div>
+            </div>
+        </div>
+    </body>
+
+</template>

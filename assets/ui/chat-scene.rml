@@ -1,23 +1,27 @@
 <rml>
-<head>
-	<title>Chat</title>
 
-	<link type="text/rcss" href="rml.rcss" />
-	<link type="text/rcss" href="chat-scene.rcss"/>
-</head>
+	<head>
+		<title>Chat</title>
 
-<body>
+		<link type="text/rcss" href="rml.rcss" />
+		<link type="text/rcss" href="chat-scene.rcss" />
+		<link type="text/rcss" href="overlays/overlay.rcss" />
 
-	<div id="app">
-		<!-- LEFT: chat list -->
-		<div id="sidebar">
-			<div id="sidebar_header">
-				<p>Чаты</p>
-				<button id="server-leave">Покинуть сервер</button>
-			</div>
+		<link type="text/template" href="overlays/create-group-overlay.rml" />
+	</head>
 
-			<div id="chat_list">
-				<!-- <div class="chat-item active">
+	<body>
+
+		<div id="app">
+			<!-- LEFT: chat list -->
+			<div id="sidebar">
+				<div id="sidebar_header">
+					<p>Чаты</p>
+					<button id="server-leave">Покинуть сервер</button>
+				</div>
+
+				<div id="chat_list">
+					<!-- <div class="chat-item active">
 					<div class="chat-title">Общий</div>
 					<div class="chat-last">Последнее: «Ок, понял»</div>
 				</div>
@@ -26,35 +30,37 @@
 					<div class="chat-title">Поддержка</div>
 					<div class="chat-last">Последнее: «Здравствуйте!»</div>
 				</div> -->
-			</div>
+				</div>
 
-			<div id="sidebar_footer">
-				<button id="open_group_panel">Создать группу</button>
-			</div>
-		</div>
-
-		<!-- RIGHT: messages -->
-		<div id="main">
-			<div id="chat_header">
-				<div id="chat_name"></div>
-
-				<div id="chat_actions">
-					<button id="add_member_btn">Добавить участника в группу</button>
-					<button id="leave_group_btn">Покинуть группу</button>
+				<div id="sidebar_footer">
+					<button id="open_group_panel">Создать группу</button>
 				</div>
 			</div>
 
-			<div id="messages"></div>
+			<!-- RIGHT: messages -->
+			<div id="main">
+				<div id="chat_header">
+					<div id="chat_name"></div>
 
-			<div id="composer">
-				<input id="message_input" type="text" value=""/>
-				<button id="send_button">Отправить</button>
+					<div id="chat_actions">
+						<button id="add_member_btn">Добавить участника в группу</button>
+						<button id="leave_group_btn">Покинуть группу</button>
+					</div>
+				</div>
+
+				<div id="messages"></div>
+
+				<div id="composer">
+					<input id="message_input" type="text" value="" />
+					<button id="send_button">Отправить</button>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<!-- CREATE GROUP PANEL (overlay). По умолчанию скрыто: class="hidden"
-	<div id="group_overlay" class="hidden">
+		<template src="create-group-overlay"></template>
+
+		<!-- CREATE GROUP PANEL (overlay). По умолчанию скрыто: class="hidden" -->
+		<!-- <div id="group_overlay" class="hidden">
 		<div id="group_panel">
 			<div id="group_panel_header">Создание группы</div>
 
@@ -77,5 +83,5 @@
 		</div>
 	</div> -->
 
-</body>
+	</body>
 </rml>
