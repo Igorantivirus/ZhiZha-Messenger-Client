@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.22.1)
 
 set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)  # Запрещает fallback на старый стандарт
-set(CMAKE_CXX_EXTENSIONS OFF)        # Отключает расширения компилятора
+set(CMAKE_CXX_STANDARD_REQUIRED ON) # Запрещает fallback на старый стандарт
+set(CMAKE_CXX_EXTENSIONS OFF) # Отключает расширения компилятора
+# cmake_policy(SET CMP0167 NEW)
 
 project("Client-UI" LANGUAGES CXX C)
 
@@ -27,16 +28,16 @@ else()
   set(BUILD_TYPE_MACRO "DEBUG_BUILD_TYPE")
 endif()
 
-if(MSVC)
-  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-endif()
+# if(MSVC)
+#   set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# endif()
 
-set(RmlUi_DIR      "${EXTERNAL_DIR}/RmlUi-6.2/${CMAKE_ABI}/${LIBS_BUILD_TYPE}/lib/cmake/RmlUi")
-set(Freetype_DIR   "${EXTERNAL_DIR}/FreeType/${CMAKE_ABI}/${LIBS_BUILD_TYPE}/lib/cmake/freetype")
+set(RmlUi_DIR "${EXTERNAL_DIR}/RmlUi-6.2/${CMAKE_ABI}/${LIBS_BUILD_TYPE}/lib/cmake/RmlUi")
+set(Freetype_DIR "${EXTERNAL_DIR}/FreeType/${CMAKE_ABI}/${LIBS_BUILD_TYPE}/lib/cmake/freetype")
 set(SDLWrapper_DIR "${EXTERNAL_DIR}/SDLWrapper/${CMAKE_ABI}/${LIBS_BUILD_TYPE}/lib/cmake/SDLWrapper")
 
 if(NOT DEFINED EXTERNAL_DIR)
-    message(ERROR EXTERNAL_DIR is not defined)
+  message(ERROR EXTERNAL_DIR is not defined)
 endif()
 
 set(VENDOR_CPP
@@ -71,16 +72,8 @@ set(INCLUDE_PATHS
 
 #--------------------------FIND_PACKAGE--------------------------#
 
-#nlohmann_json
-if(WIN32)
-    find_package(nlohmann_json 3.12.0 REQUIRED)
-    add_library(nlohmann_json INTERFACE IMPORTED)
-else()
-    find_package(nlohmann_json REQUIRED)
-endif()
-#end nlohmann_json
-
-find_package(Boost 1.70 REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED)
+find_package(Threads REQUIRED)
 
 find_package(SDL3 CONFIG REQUIRED)
 find_package(SDL3_image CONFIG REQUIRED)
@@ -95,10 +88,19 @@ add_library(clientui_network OBJECT ${NETWORK_CPP})
 add_library(clientui_protocol OBJECT ${PROTOCOL_CPP})
 add_library(clientui_app OBJECT ${APP_CPP})
 
+# Посмотрим, какой файл линкуется
+get_target_property(SDL3_IMPORTED_LOC SDL3::SDL3 IMPORTED_LOCATION)
+message(STATUS "SDL3::SDL3 location: ${SDL3_IMPORTED_LOC}")
+
+# И какие зависимости
+get_target_property(SDL3_INTERFACE_LINK_LIBS SDL3::SDL3 INTERFACE_LINK_LIBRARIES)
+message(STATUS "SDL3::SDL3 interface deps: ${SDL3_INTERFACE_LINK_LIBS}")
+
 add_library(clientui_common INTERFACE)
 target_include_directories(clientui_common INTERFACE
   ${INCLUDE_PATHS}
   ${Boost_INCLUDE_DIRS}
+  $ENV{LIBS_ROOT}/src/nlohmann_json_3_12_0/single_include
 )
 target_compile_definitions(clientui_common INTERFACE
   RMLUI_SDL_VERSION_MAJOR=3
@@ -110,12 +112,11 @@ target_compile_definitions(clientui_common INTERFACE
 )
 
 target_link_libraries(clientui_common INTERFACE
-  SDL3::SDL3
+  SDL3::SDL3-static
   SDL3_image::SDL3_image
   SDL3_mixer::SDL3_mixer
   SDLWrapper::SDLWrapper
   RmlUi::RmlUi
-  nlohmann_json::nlohmann_json
 )
 if(ANDROID)
   target_link_libraries(clientui_common INTERFACE freetype)
@@ -134,12 +135,18 @@ target_link_libraries(clientui_network PRIVATE clientui_common)
 target_link_libraries(clientui_protocol PRIVATE clientui_common)
 target_link_libraries(clientui_app PRIVATE clientui_common)
 
-if (ANDROID)
+if(ANDROID)
   find_package(ZLIB REQUIRED)
   add_library(${PROJECT_NAME} SHARED ${SRC_DIR}/main.cpp ${SOURCE_HPP})
 else()
   add_executable(${PROJECT_NAME} ${SRC_DIR}/main.cpp ${SOURCE_HPP})
 endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::headers Threads::Threads)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+  $ENV{LIBS_ROOT}/src/nlohmann_json_3_12_0/single_include
+)
 
 #--------------------------TARGET--------------------------#
 
@@ -159,18 +166,17 @@ if(ANDROID)
   )
 endif()
 
-
 #--------------------------OPTIMIATION--------------------------#
 
 if(ANDROID AND (CMAKE_BUILD_TYPE MATCHES "Release|MinSizeRel"))
   target_compile_options(${PROJECT_NAME} PRIVATE
-          -O3
-          -ffunction-sections -fdata-sections
-          -fomit-frame-pointer
+    -O3
+    -ffunction-sections -fdata-sections
+    -fomit-frame-pointer
   )
   target_link_options(${PROJECT_NAME} PRIVATE
-          -Wl,--gc-sections
-          -Wl,--as-needed
+    -Wl,--gc-sections
+    -Wl,--as-needed
   )
 endif()
 

@@ -2,67 +2,166 @@
   "version": 6,
   "configurePresets": [
     {
-      "name": "win-clangd",
-      "generator": "Ninja",
-      "binaryDir": "build/clangd",
-      "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_CXX_STANDARD": "23",
-        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
-        "CMAKE_CXX_EXTENSIONS": "OFF",
-        "CMAKE_CXX_COMPILER": "C:/Program Files/LLVM/bin/clang-cl.exe"
-      }
-    },
-    {
-      "name": "win-base",
-      "displayName": "MSVC Ninja",
-      "generator": "Ninja",
-      "binaryDir": "build/win-base",
-      "environment": {
-        "PATH": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64;C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x64;$penv{PATH}",
-        "INCLUDE": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/include;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/ucrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/um;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/shared;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/winrt;C:/Program Files (x86)/Windows Kits/10/Include/10.0.22621.0/cppwinrt;$penv{INCLUDE}",
-        "LIB": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/lib/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/ucrt/x64;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0/um/x64;$penv{LIB}"
+      "name": "msvc-ninja-multiconfig-base",
+      "hidden": true,
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
       },
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_TARGET_TRIPLET": "x64-windows",
-        "CMAKE_CXX_STANDARD": "23",
-        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
-        "CMAKE_CXX_EXTENSIONS": "OFF",
-        "EXTERNAL_DIR": "D:/dev/libraries/_install",
-        "CMAKE_ABI": "msvc-x64-win-mt"
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_DEFAULT_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "win-debug",
-      "inherits": "win-base",
-      "displayName": "Windows Debug",
-      "binaryDir": "build",
+      "name": "msvc-x64-win-mt",
+      "inherits": "msvc-ninja-multiconfig-base",
       "cacheVariables": {
-        "USE_CONSOLE": "TRUE",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+      }
+    },
+    {
+      "name": "msvc-x64-win-md",
+      "inherits": "msvc-ninja-multiconfig-base",
+      "cacheVariables": {
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDLL$<$<CONFIG:Debug>:Debug>"
+      }
+    },
+
+    {
+      "name": "gcc-ninja-multiconfig-base",
+      "hidden": true,
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_DEFAULT_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "gcc-x64-linux-ninja",
+      "inherits": "gcc-ninja-multiconfig-base"
+    },
+
+    {
+      "name": "gcc-make-debug",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
-      "name": "win-release",
-      "inherits": "win-base",
-      "displayName": "Windows Release",
-      "binaryDir": "build",
+      "name": "gcc-make-release",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
       "cacheVariables": {
-        "USE_CONSOLE": "FALSE",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "win-relwithdebinfo",
-      "inherits": "win-base",
-      "displayName": "Windows ReleaseWithDebugInfo",
-      "binaryDir": "build",
+      "name": "gcc-make-relwithdebinfo",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build/",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
       "cacheVariables": {
-        "USE_CONSOLE": "FALSE",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug-mt",
+      "configurePreset": "msvc-x64-win-mt",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Release-mt",
+      "configurePreset": "msvc-x64-win-mt",
+      "configuration": "Release"
+    },
+    {
+      "name": "RelWithDebInfo-mt",
+      "configurePreset": "msvc-x64-win-mt",
+      "configuration": "RelWithDebInfo"
+    },
+    {
+      "name": "Debug-md",
+      "configurePreset": "msvc-x64-win-md",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Release-md",
+      "configurePreset": "msvc-x64-win-md",
+      "configuration": "Release"
+    },
+    {
+      "name": "RelWithDebInfo-md",
+      "configurePreset": "msvc-x64-win-md",
+      "configuration": "RelWithDebInfo"
+    },
+
+    {
+      "name": "Debug-gcc-ninja",
+      "configurePreset": "gcc-x64-linux-ninja",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Release-gcc-ninja",
+      "configurePreset": "gcc-x64-linux-ninja",
+      "configuration": "Release"
+    },
+    {
+      "name": "RelWithDebInfo-gcc-ninja",
+      "configurePreset": "gcc-x64-linux-ninja",
+      "configuration": "RelWithDebInfo"
+    },
+
+    {
+      "name": "Debug-gcc-make",
+      "configurePreset": "gcc-make-debug"
+    },
+    {
+      "name": "Release-gcc-make",
+      "configurePreset": "gcc-make-release"
+    },
+    {
+      "name": "RelWithDebInfo-gcc-make",
+      "configurePreset": "gcc-make-relwithdebinfo"
     }
   ]
 }
